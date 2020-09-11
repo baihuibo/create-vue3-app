@@ -1,0 +1,115 @@
+// 全局样式
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    min-height: 100%;
+}
+
+a {
+    text-decoration: none;
+}
+
+#app {
+    font-size: 12px;
+    min-height: 100%;
+    background: #f0f0f1;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.box {
+    background: #ffffff;
+    padding: 20px 30px;
+}
+
+.ml-10 {
+    margin-left: 10px;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mt-15 {
+    margin-top: 15px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.pb-20 {
+    padding-bottom: 20px;
+}
+
+.mr-10 {
+    margin-right: 10px;
+}
+
+fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+    background: none;
+}
+
+.chapter-header::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 18px;
+    background-color: #2e6da4;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.split-line {
+    margin: 15px 0;
+    border-bottom: 1px dashed #d5d5d5;
+}
+
+.help-block {
+    color: #888888;
+    line-height: 25px;
+}
+
+.danger-block {
+    color: red;
+    line-height: 25px;
+}
+
+.loading-box {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 19891016;
+    background-color: rgba(0, 0, 0, 0.05);
+    position: fixed;
+    pointer-events: auto;
+
+    .loading-content {
+        width: 37px;
+        height: 37px;
+        background: url("/src/assets/loading-1.gif");
+    }
+}

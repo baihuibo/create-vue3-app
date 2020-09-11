@@ -1,0 +1,21 @@
+{
+    "name": "@5i5j/create-vue3-app",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "bin": "index.js",
+    "author": "baihuibo",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/baihuibo/create-vue3-app.git"
+    },
+    "bugs": {
+        "url": "https://github.com/baihuibo/create-vue3-app/issues"
+    },
+    "homepage": "https://github.com/baihuibo/create-vue3-app/tree/master/#readme",
+    "dependencies": {
+        "fs-extra": "^9.0.1",
+        "minimist": "^1.2.5"
+    }
+}

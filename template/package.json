@@ -1,0 +1,18 @@
+{
+    "name": "[basename]",
+    "version": "0.0.0",
+    "scripts": {
+        "dev": "vite",
+        "proxy-dev": "vite --port=80 --config=vite-proxy.config.js --env=dev",
+        "build": "vite build && npm run replace",
+        "replace": "node replace-build.js"
+    },
+    "devDependencies": {
+        "@vue/compiler-sfc": "^3.0.0-rc.10",
+        "crequire": "^1.8.1",
+        "less": "^3.12.2",
+        "vite": "^1.0.0-rc.4",
+        "vue": "^3.0.0-rc.10",
+        "vue-router": "^4.0.0-beta.9"
+    }
+}

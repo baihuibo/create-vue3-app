@@ -1,0 +1,140 @@
+.container {
+    position: relative;
+}
+
+.boxshaw {
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    width: 250px;
+    margin: 0 auto;
+    padding: 5px 10px;
+    font-size: 12px;
+    position: absolute;
+    top: 31px;
+    left: 1px;
+    z-index: 9999;
+    background: #fff;
+    box-shadow: 2px 2px 15px 2px #e3e3e3;
+
+    ul {
+        list-style: none;
+    }
+
+    .schedule-hd {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 15px;
+    }
+
+    .row {
+        flex: 1;
+        text-align: center;
+
+        > span {
+            display: inline-block;
+            margin: 0 1em;
+            cursor: pointer;
+        }
+    }
+
+    .ul-box {
+        overflow: hidden;
+    }
+
+    .ul-box > li {
+        float: left;
+        width: 14.28%;
+        text-align: center;
+        padding: 5px 0;
+    }
+
+    .other-month {
+        color: #999999;
+    }
+
+    .disabled {
+        pointer-events: none;
+        background-color: #eeeeee;
+        color: #999999;
+    }
+
+    .current-month {
+        color: #333333;
+    }
+
+    .today-style {
+        border-radius: 50%;
+        background: #58d321;
+    }
+
+    .arrow {
+        cursor: pointer;
+    }
+
+    .dayStyle {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    .current-month > .dayStyle:hover {
+        background: #00BDFF;
+        color: #ffffff;
+    }
+
+    .today-flag {
+        background: #00C2B1;
+        color: #fff;
+    }
+
+    .selected-style {
+        background-color: #ffba5a;
+        color: #ffffff;
+    }
+
+    .active-style {
+        background: #00BDFF;
+        color: #ffffff;
+    }
+
+    .today {
+        text-align: center;
+        color: #8ac6d1;
+        padding: 5px 0 0;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .icon-116leftarrowheads {
+        margin-right: 5px;
+    }
+
+    .icon-115rightarrowheads {
+        margin-left: 5px;
+    }
+
+    .icon-116leftarrowheads:after {
+        content: '<<'
+    }
+
+    .icon-112leftarrowhead:after {
+        content: '<'
+    }
+
+    .icon-111arrowheadright:after {
+        content: '>'
+    }
+
+    .icon-115rightarrowheads:after {
+        content: '>>'
+    }
+
+}
