@@ -5,10 +5,10 @@ module.exports = {
     sourcemap: true,
     proxy: {
         // 代理转发
-        '/[basename]': {
-            target: `http://${env}.cbs.bacic5i5j.com`,
-            changeOrigin: true,
-        },
+        // 'bdc': {
+        //     target: `http://${env}.cbs.bacic5i5j.com`,
+        //     changeOrigin: true,
+        // },
         '/base': {
             target: `http://${env}.cbs.bacic5i5j.com`,
             changeOrigin: true,

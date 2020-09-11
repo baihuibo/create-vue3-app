@@ -32,8 +32,8 @@ $ npm run build
 module.exports = {
     proxy: {
         // yApi 接口代理
-        // 将所有 /[template] 开始的接口，指向 mock 服务器
-        '/[basename]': 'http://yapi.cbs.bacic5i5j.com/mock/20',
+        // 将所有 /[template]-api 开始的接口，指向 mock 服务器
+        '/[basename]-api': 'http://yapi.cbs.bacic5i5j.com/mock/20',
     }
 }
 ```

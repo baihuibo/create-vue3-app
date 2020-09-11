@@ -100,7 +100,7 @@
 
 <script setup>
 import {reactive, ref} from "vue";
-import {singleThreadWrapFn} from "../util";
+import {singleThreadWrapFn} from "../../util";
 
 export const form = ref({});
 export const pagingRef = ref({});

@@ -4,6 +4,8 @@
     "scripts": {
         "dev": "vite",
         "proxy-dev": "vite --port=80 --config=vite-proxy.config.js --env=dev",
+        "proxy-sit": "vite --port=80 --config=vite-proxy.config.js --env=sit-cbs",
+        "proxy-uat": "vite --port=80 --config=vite-proxy.config.js --env=uat",
         "build": "vite build && npm run replace",
         "replace": "node replace-build.js"
     },
