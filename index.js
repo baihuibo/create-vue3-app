@@ -18,7 +18,8 @@ async function init() {
     }
 
     const renameFiles = {
-        '-gitignore': '.gitignore'
+        '-gitignore': '.gitignore',
+        '-editorconfig': '.editorconfig',
     };
     const write = async (file, content) => {
         const targetPath = path.join(root, renameFiles[file] || file);
