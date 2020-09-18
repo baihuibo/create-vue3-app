@@ -1,4 +1,4 @@
-import {getCurrentInstance, isRef, onUnmounted, onUpdated, watchEffect} from "vue";
+import {getCurrentInstance, isRef, onBeforeUnmount, onUpdated, watchEffect} from "vue";
 import validates from './validates';
 
 /**
@@ -49,7 +49,7 @@ export function registerValidate({ref: elementRef, props, valueKey = 'modelValue
     }
 
     // 元素被销毁的时候，同时取消注册的监听器
-    onUnmounted(() => {
+    onBeforeUnmount(() => {
         const node = getNode(elementRef);
         if (node && node.form) {
             unPatchForm(node.form, currentInstance);

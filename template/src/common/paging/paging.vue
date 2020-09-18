@@ -63,9 +63,7 @@ export default {
         const orderNum = ref(0);
         const _goPageRef = ref('');
         const _pageItemsRef = ref([]);
-
-        // 上一次查询参数缓存
-        let _cacheParams;
+        const cacheParamsRef = ref(); // 上一次查询参数缓存
 
         /**
          * 查询数据
@@ -100,7 +98,7 @@ export default {
             }
 
             if (+result.code === 0) {
-                _cacheParams = params; // 缓存参数
+                cacheParamsRef.value = params; // 缓存参数
                 _goPageRef.value = '';
                 const data = result.data;
 
@@ -143,7 +141,7 @@ export default {
          * @return {Promise<Object>}
          */
         function refresh(reload) {
-            return query(_cacheParams, reload ? 1 : currentPage.value);
+            return query(cacheParamsRef.value, reload ? 1 : currentPage.value);
         }
 
         // 还原状态
@@ -174,7 +172,7 @@ export default {
                 }
 
                 _goPageRef.value = null;
-                query(_cacheParams, pageIndex);
+                query(cacheParamsRef.value, pageIndex);
             }
         }
 
@@ -186,7 +184,7 @@ export default {
         function _selectRefresh(size) {
             pageSize.value = size;
             if (total.value > size || totalPage.value > 1) { // 优化，如果没有需要根据size分页的数据，则不进行查询
-                query(_cacheParams);
+                query(cacheParamsRef.value);
             }
         }
 
@@ -196,7 +194,7 @@ export default {
         }
 
         return {
-            props,
+            props, cacheParamsRef,
             rollback, refresh, query, _goPage, _selectRefresh,
             list, total, totalPage, pageSize, currentPage, orderNum,
             _goPageRef, _pageItemsRef, addQueryListen

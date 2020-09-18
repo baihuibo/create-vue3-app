@@ -70,6 +70,7 @@ paging.totalPage   // 总页数
 paging.pageSize    // 每页条数
 paging.currentPage // 当前页
 paging.orderNum    // 当前页开始序号
+paging.cacheParamsRef    // 当前页面数据查询参数
 ```
 
 

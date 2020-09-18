@@ -12,16 +12,19 @@ export default {
 
 function doPermission(el, arg, show) {
     if (el._promission) {
+        setStyle();
         return;
     }
     el._promission = true;
-    findPermission(arg, map => {
+    findPermission(arg, setStyle);
+
+    function setStyle(map = cache) {
         // 开发环境时，默认所有权限都为true
         // 非开发环境时，需要根据权限调整元素显示
         if (process.env.NODE_ENV === 'development') {
             return;
         }
-        if (!map[arg] && el.style) {
+        if (map[arg] === false && el.style) {
             el.tabIndex = -1;
             el.style.pointerEvents = 'none';
             el.style.color = '#c1c1c1';
@@ -30,7 +33,7 @@ function doPermission(el, arg, show) {
                 el.classList.add('hide');
             }
         }
-    });
+    }
 }
 
 // 查询权限
@@ -55,8 +58,8 @@ function findPermission(code, cb) {
         callbacks.length = 0;
         const result = await post('/bdc/search/checkPermission.htm', {code: searchCodes});
         const map = result.data || {};
-        cbs.forEach(fn => fn(map));
         Object.assign(cache, map); // 缓存数据
+        cbs.forEach(fn => fn(map));
     });
 }
 
