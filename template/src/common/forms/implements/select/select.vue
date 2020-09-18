@@ -8,9 +8,11 @@
                :disabled="disabled"
                :class="dropdownShowRef ? 'open' : ''"
                @keydown.prevent.stop
-               @pause.prevent
+               @pause.prevent.stop
+               @cut.prevent.stop
                @mousedown.prevent.stop
-               @click="dropdownOpen">
+               @click="dropdownOpen"
+               @focus="dropdownOpen">
         <i class="iconfont icon-xiala"></i>
         <div ref="dropdownRef" class="dropdown"
              :class="{focus:dropdownShowRef}"
@@ -50,6 +52,7 @@ export default {
         disabled: Boolean,
         multiple: Boolean,  //多选
         modelValue: [String, Number],
+        label: [String, Array],
         placeholder: {type: String, default: '请选择'},
         noPlaceholder: Boolean,
         keyCode: String,
@@ -97,13 +100,17 @@ watchEffect(() => {
 })
 
 export function dropdownOpen() {
-    loadData()
-    dropdownShowRef.value = true;
-    nextTick(() => {
-        if (dropdownRef.value) {
-            dropdownRef.value.focus()
-        }
-    })
+    if (!dropdownShowRef.value) {
+        loadData()
+        dropdownShowRef.value = true;
+        nextTick(() => {
+            if (dropdownRef.value) {
+                dropdownRef.value.focus()
+            }
+        })
+    } else {
+        rollBackData();
+    }
 }
 
 export function dropdownBlur() {
@@ -155,6 +162,9 @@ export function toggleSelected(item) {
     emit('change');
     setViewValue()
 
+    const labels = listRef.value.filter(a => isSelect(a.valueCode)).map(a => a.valueName)
+    emit('update:label', props.multiple ? labels : labels[0]);
+
     function close() {
         nextTick(rollBackData);
     }
@@ -177,8 +187,8 @@ async function loadData() {
     if (!canLoad) {
         return
     }
-    listRef.value = (await getKeyCodes(props.keyCode)).data || [];
     canLoad = false;
+    listRef.value = (await getKeyCodes(props.keyCode)).data || [];
 }
 
 let oldSearchText, filterList;
@@ -212,6 +222,7 @@ function setViewValue() {
 function rollBackData() {
     dropdownShowRef.value = false;
     searchText.value = '';
+    filterList = []
 }
 </script>
 
@@ -222,6 +233,10 @@ function rollBackData() {
 
     .form-control {
         cursor: default;
+
+        &, &::placeholder {
+            color: #000;
+        }
 
         &.open {
             border-radius: 2px 2px 0 0;
