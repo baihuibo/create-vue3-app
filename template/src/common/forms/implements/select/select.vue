@@ -1,40 +1,28 @@
 <template>
     <div class="multiple-select">
-        <input ref="elementRef"
-               type="text"
-               class="form-control"
-               :value="viewValue"
-               :placeholder="noPlaceholder !== true ? placeholder : ''"
-               :disabled="disabled"
-               :class="dropdownShowRef ? 'open' : ''"
-               @keydown.prevent.stop
-               @pause.prevent.stop
-               @cut.prevent.stop
-               @mousedown.prevent.stop
-               @click="dropdownOpen"
-               @focus="dropdownOpen">
-        <i class="iconfont icon-xiala"></i>
-        <div ref="dropdownRef" class="dropdown"
-             :class="{focus:dropdownShowRef}"
-             v-show="dropdownShowRef" tabindex="-1" @blur="dropdownBlur">
+        <input ref="elementRef" class="form-control" :class="dropdownShowRef ? 'open' : ''"
+               type="text" :value="viewValue"
+               :placeholder="noPlaceholder !== true ? placeholder : ''" :disabled="disabled"
+               @keydown.prevent.stop @pause.prevent.stop @cut.prevent.stop @mousedown.prevent.stop
+               @click="dropdownOpen" @focus="dropdownOpen">
+        <div ref="dropdownRef" class="dropdown" tabindex="-1" v-if="dropdownShowRef" @blur="dropdownBlur">
             <div class="search-wrap">
-                <input type="text"
-                       ref="searchInputRef"
-                       class="form-control"
-                       placeholder="请搜索..."
-                       v-model="searchText"
-                       @focus="searchFocus"
-                       @blur="searchBlur">
-                <i class="iconfont icon-sousuo"></i>
+                <input type="text" ref="searchInputRef" class="form-control"
+                       placeholder="请搜索..." v-model="searchText"
+                       @focus="searchFocus" @blur="searchBlur">
             </div>
-            <ul class="ulList">
+            <ul class="ul-list">
                 <li v-if="noPlaceholder !== true && !multiple" @click="toggleSelected()">{{ placeholder }}</li>
                 <li v-for="item in filter(searchText)"
+                    :class="{
+                        active:!multiple && isSelect(item.valueCode),
+                        'active-multiple' : multiple && isSelect(item.valueCode)
+                    }"
                     @click="toggleSelected(item)"
-                    :class="{active:isSelect(item.valueCode)}"
                     layout="row" layout-align="start center">
+                    <input type="checkbox" tabindex="-1"
+                           v-if="multiple" :checked="isSelect(item.valueCode)">
                     <div flex class="text">{{ item.valueName }}</div>
-                    <i class="iconfont icon-gouxuan" v-if="isSelect(item.valueCode)"></i>
                 </li>
             </ul>
         </div>
@@ -51,7 +39,7 @@ export default {
         list: Array,
         disabled: Boolean,
         multiple: Boolean,  //多选
-        modelValue: [String, Number],
+        modelValue: [String, Number, Array],
         label: [String, Array],
         placeholder: {type: String, default: '请选择'},
         noPlaceholder: Boolean,
@@ -89,14 +77,18 @@ onMounted(async () => {
     setViewValue()
 })
 
-watchEffect(() => {
-    if (props.list && props.list.length) {
-        listRef.value = props.list
+watchEffect(async () => {
+    let setVal = 0;
+    if (Array.isArray(props.list) && props.list.length && listRef.value !== props.list) {
+        listRef.value = props.list;
+        setVal = 1;
     }
     if (selecteds.value.toString() !== getModelValue().toString()) {
         selecteds.value = getModelValue().slice(0);
+        await loadData();
+        setVal = 1;
     }
-    setViewValue();
+    setVal && setViewValue();
 })
 
 export function dropdownOpen() {
@@ -141,12 +133,12 @@ export function toggleSelected(item) {
         const {valueCode} = item;
         if (!props.multiple) {
             close();
-            if (modelValue[0] === valueCode) {
+            if (modelValue.length === 1 && _eq(modelValue[0], valueCode)) {
                 return;
             }
             modelValue = [valueCode];
         } else {
-            const index = modelValue.findIndex(item => item === valueCode)
+            const index = modelValue.findIndex(item => _eq(item, valueCode));
             if (index > -1) {
                 modelValue.splice(index, 1)
             } else {
@@ -158,29 +150,19 @@ export function toggleSelected(item) {
         modelValue = [];
     }
     selecteds.value = modelValue;
-    emit('update:modelValue', props.multiple ? modelValue : modelValue[0]);
-    emit('change');
-    setViewValue()
 
-    const labels = listRef.value.filter(a => isSelect(a.valueCode)).map(a => a.valueName)
+    const value = props.multiple ? modelValue : modelValue[0];
+    const labels = listRef.value.filter(a => isSelect(a.valueCode)).map(a => a.valueName);
+
+    emit('update:modelValue', value);
     emit('update:label', props.multiple ? labels : labels[0]);
+    emit('change', value);
+
+    setViewValue()
 
     function close() {
         nextTick(rollBackData);
     }
-}
-
-export function isSelect(code) {
-    return !!selecteds.value.find(a => a == code); // 忽略数字与字母
-}
-
-function getModelValue() {
-    if (props.multiple) {
-        return props.modelValue || [];
-    } else if (props.modelValue != null && props.modelValue !== '') {
-        return [props.modelValue];
-    }
-    return []
 }
 
 async function loadData() {
@@ -209,10 +191,10 @@ export function filter(searchText = '') {
 function setViewValue() {
     const modelValue = selecteds.value;
     if (modelValue.length) {
-        if (modelValue.length > 3) {
+        if (modelValue.length > 4) {
             viewValue.value = `已选中${modelValue.length}个`
         } else {
-            viewValue.value = listRef.value.filter(a => isSelect(a.valueCode)).map(a => a.valueName).join(',');
+            viewValue.value = listRef.value.filter(a => isSelect(a.valueCode)).map(a => a.valueName).join('、');
         }
     } else {
         viewValue.value = ''
@@ -223,6 +205,24 @@ function rollBackData() {
     dropdownShowRef.value = false;
     searchText.value = '';
     filterList = []
+}
+
+function getModelValue() {
+    const {modelValue} = props;
+    if (props.multiple) {
+        return modelValue || [];
+    } else if (modelValue != null && modelValue !== '' && !isNaN(modelValue)) {
+        return [modelValue];
+    }
+    return []
+}
+
+export function isSelect(code) {
+    return selecteds.value.findIndex(a => _eq(a, code)) > -1;
+}
+
+function _eq(a, b) {
+    return a == b;
 }
 </script>
 
@@ -243,20 +243,6 @@ function rollBackData() {
         }
     }
 
-    .focus {
-        &:focus {
-            outline: 0;
-        }
-    }
-
-    .icon-xiala {
-        position: absolute;
-        top: 0;
-        right: 8px;
-        font-size: 13px;
-        color: #000000;
-    }
-
     .dropdown {
         position: absolute;
         z-index: 99999;
@@ -267,56 +253,72 @@ function rollBackData() {
         top: 100%;
         margin-top: -2px;
 
-        .ulList {
+        &:focus {
+            outline: 0;
+        }
+
+        .ul-list {
             max-height: 200px;
             overflow-y: auto;
             margin: 0 5px;
-            padding: 4px 0;
-        }
+            padding: 4px;
 
-        .ulList::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .ulList::-webkit-scrollbar-thumb {
-            border-radius: 10px;
-            background: rgba(52, 51, 51, 0.2);
-        }
-
-        .ulList::-webkit-scrollbar-track {
-            border-radius: 0;
-            background: transparent;
-        }
-
-        li {
-            position: relative;
-            list-style: none;
-            padding: 0 10px;
-            height: 26px;
-            line-height: 30px;
-            cursor: default;
-
-            .text {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+            &::-webkit-scrollbar {
+                width: 8px;
             }
 
-            &:hover, &.active {
-                background-color: #e8e8e8;
+            &::-webkit-scrollbar-thumb {
+                border-radius: 10px;
+                background: rgba(52, 51, 51, 0.2);
             }
 
-            .icon-gouxuan {
-                position: absolute;
-                top: 0px;
-                right: 20px;
-                font-size: 14px;
-                color: rgb(53, 95, 214);
-                vertical-align: baseline;
+            &::-webkit-scrollbar-track {
+                border-radius: 0;
+                background: transparent;
             }
 
-            &.active {
-                color: rgb(53, 95, 214);
+            li {
+                position: relative;
+                list-style: none;
+                height: 26px;
+                line-height: 30px;
+                cursor: default;
+                padding: 0 4px;
+
+                input[type=checkbox] {
+                    pointer-events: none;
+                    margin-right: 5px;
+                }
+
+                &:not(:last-child) {
+                    border-bottom: 1px solid #f1f1f1;
+                }
+
+                .text {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .selected-icon {
+                    display: none;
+                    font-size: 6px;
+                }
+
+                &.active-multiple {
+                    .text {
+                        color: rgb(53, 95, 214);
+                    }
+
+                    .selected-icon {
+                        display: block;
+                    }
+                }
+
+                &:hover, &.active {
+                    background-color: #e8e8e8;
+                    border-color: #e8e8e8;
+                }
             }
         }
 
@@ -324,16 +326,7 @@ function rollBackData() {
             height: 28px;
             position: relative;
             padding: 6px 8px;
-
-            .icon-sousuo {
-                position: absolute;
-                top: 0px;
-                right: 15px;
-                font-size: 13px;
-                color: #dcdcdc;
-            }
         }
-
     }
 }
 </style>
