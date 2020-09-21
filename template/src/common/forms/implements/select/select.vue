@@ -4,7 +4,7 @@
                type="text" :value="viewValue"
                :placeholder="noPlaceholder !== true ? placeholder : ''" :disabled="disabled"
                @keydown.prevent.stop @pause.prevent.stop @cut.prevent.stop @mousedown.prevent.stop
-               @click="dropdownOpen" @focus="dropdownOpen">
+               @click="dropdownOpen">
         <div ref="dropdownRef" class="dropdown" tabindex="-1" v-if="dropdownShowRef" @blur="dropdownBlur">
             <div class="search-wrap">
                 <input type="text" ref="searchInputRef" class="form-control"
