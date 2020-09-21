@@ -32,6 +32,7 @@ export default {
         pageSize: Number,
         params: {},
         beforeSend: Function,
+        emptySearch: Boolean,
         placeholder: String,
         responseHandler: Function,
         disabled: Boolean,
@@ -73,7 +74,7 @@ export default {
         }
 
         const initQuery = debounce(function () {
-            if (!valueRef.value.trim()) { // 清空内容时，列表也会被清空
+            if (!valueRef.value.trim() && !props.emptySearch) { // 清空内容时，列表也会被清空
                 listRef.value = [];
                 setValue();
                 return;
@@ -144,6 +145,11 @@ export default {
                     viewRef.value.scrollTop = selectScrollTop;
                 }
             });
+            if (!listRef.value || !listRef.value.length) {
+                if (props.emptySearch) {
+                    initQuery();
+                }
+            }
         }
 
         async function query(params, pageIndex = 1) {
@@ -170,12 +176,12 @@ export default {
             }
             if (+result.code === 0) {
                 _cacheParams = params; // 缓存参数
-                const data = result.data;
+                const {rows, totalPage} = result.data || {};
                 // 设置组件数据
-                listRef.value = [...listRef.value, ...data.rows];
+                listRef.value = [...listRef.value, ...(rows || [])];
                 showNoResultRef.value = !listRef.value.length;
                 currentPage = pageIndex;
-                canNext = pageIndex < data.totalPage; // 如果当前页还不是最后一页，则还可以允许继续请求
+                canNext = pageIndex < totalPage; // 如果当前页还不是最后一页，则还可以允许继续请求
             } else {
                 alert(result.msg);
             }

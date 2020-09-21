@@ -87,6 +87,31 @@ fuzzy 模糊查询接口所需的查询参数
 </script>
 ```
 
+基本使用---- empty-search
+
+在空值的时候也触发搜索（点击即触发搜索）
+
+```vue
+<template>
+    <form-item type="live-search"
+               empty-search
+               search-content="searchContent" url="/bdc/search/buildNames" v-model:id="dataRef.id" v-model:name="dataRef.name"/>
+
+</template>
+
+<script>
+    export default {
+        setup(){
+            const dataRef = reactive({
+                id:"123",
+                name:"abc"
+            });
+            return {dataRef}
+        }
+    }
+</script>
+```
+
 
 
 基本使用----beforeSend
@@ -105,7 +130,7 @@ fuzzy 模糊查询接口所需的查询参数
                 name:"abc"
             });
 
-        
+
             function beforeSend(param){
                 console.log(param)  //当前请求的参数 -- 可作出改变
                 return param; //将改变后的请求参数return
@@ -128,7 +153,7 @@ fuzzy 模糊查询接口所需的查询参数
                     valueName:"显示名字"
                 }],
             total:15,
-            totalPage:1     
+            totalPage:1
         },
     msg:""
 }
@@ -147,7 +172,7 @@ fuzzy 模糊查询接口所需的查询参数
                 name:"abc"
             });
 
-        
+
 
             function beforeSend(param){
                 console.log(param)  //当前请求的参数 -- 可作出改变
@@ -155,7 +180,7 @@ fuzzy 模糊查询接口所需的查询参数
             }
 
             function responseHandler(responseData){
-                console.log(param)  //接口返回的数据 -- 可作出改变   
+                console.log(param)  //接口返回的数据 -- 可作出改变
                 return responseData //将改变后的数据return   --注意:格式不能发生变化
             }
             return {dataRef,beforeSend,responseHandler}
@@ -179,8 +204,6 @@ fuzzy 模糊查询接口所需的查询参数
                 name:"abc"
             });
 
-        
-
             function beforeSend(param){
                 console.log(param)  //当前请求的参数 -- 可作出改变
                 return param; //将改变后的请求参数return  --注意:格式不能发生变化
@@ -192,7 +215,7 @@ fuzzy 模糊查询接口所需的查询参数
             }
 
             function change(data){
-                console.log(data)  //{valueCode:"123",valueName:"显示名字"}    
+                console.log(data)  //{valueCode:"123",valueName:"显示名字"}
             }
             return {dataRef,beforeSend,responseHandler,change}
         }
