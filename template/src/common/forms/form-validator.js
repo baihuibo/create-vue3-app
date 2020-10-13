@@ -11,7 +11,7 @@ import validates from './validates';
 export function registerValidate({ref: elementRef, props, valueKey = 'modelValue'}, ...otherProps) {
 
     let oldValue, oldRule, initialize = false,
-        currentInstance = getCurrentInstance();
+        instance = getCurrentInstance();
 
     watchEffect(trigger);
     onUpdated(trigger);
@@ -43,7 +43,7 @@ export function registerValidate({ref: elementRef, props, valueKey = 'modelValue
         if (!node || !node.form) {
             return;
         }
-        patchForm(node.form, currentInstance, elementRef, props, valueKey, otherProps);
+        patchForm(node.form, {instance, elementRef, props, valueKey, otherProps});
         initialize = true;
         return initialize;
     }
@@ -52,7 +52,7 @@ export function registerValidate({ref: elementRef, props, valueKey = 'modelValue
     onBeforeUnmount(() => {
         const node = getNode(elementRef);
         if (node && node.form) {
-            unPatchForm(node.form, currentInstance);
+            unPatchForm(node.form, instance);
         }
     })
 }
@@ -64,12 +64,12 @@ function getNode(ref) {
     return ref.value.nodeType === 1 ? ref.value : ref.value[0]
 }
 
-function patchForm(form, instance, elementRef, props, valueKey, otherProps) {
+function patchForm(form, item) {
     if (form._patched) {
-        form._instances.push({instance, elementRef, props, valueKey, otherProps});
+        form._instances.push(item);
         return;
     }
-    form._instances = [{instance, elementRef, props, valueKey, otherProps}];
+    form._instances = [item];
     form._patched = true;
     form.addEventListener('submit', function () {
         form.classList.add('v-submitted');

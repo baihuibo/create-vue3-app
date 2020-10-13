@@ -1,13 +1,13 @@
 <template>
     <div class="modal fade" tabindex="-1" role="dialog"
          :class="{'in' : start,'disabled-select':canMove}"
-         @mousemove="_mousemove" @mouseup="_mouseup">
+         @mousemove="mousemove" @mouseup="mouseup">
         <div class="modal-dialog" :style="fullscreen ? null : {width,height}" :class="{fullscreen,frame}"
              ref="dragRef">
             <div class="modal-content" layout="column">
                 <div class="modal-header" layout="row" layout-align="space-between center"
                      v-if="!noTitle"
-                     @mousedown="_mousedown">
+                     @mousedown="mousedown">
                     {{ title }}
                     <a href="javascript:" @click="closeDialog()" @mousedown.stop class="modal-close">&times;</a>
                 </div>
@@ -47,7 +47,7 @@ export default {
 
 
         let canMove = ref(false), current, matchX = 0, matchY = 0;
-        const _mousedown = (e) => {
+        const mousedown = (e) => {
             if (fullscreen || frame) {
                 return;
             }
@@ -59,10 +59,10 @@ export default {
                 matchY = parseFloat(match[1]);
             }
         };
-        const _mouseup = (e) => {
+        const mouseup = (e) => {
             canMove.value = false;
         };
-        const _mousemove = throttle((e) => {
+        const mousemove = throttle((e) => {
             if (current && canMove.value) {
                 const x = e.pageX - current.pageX + matchX;
                 const y = e.pageY - current.pageY + matchY;
@@ -70,7 +70,7 @@ export default {
             }
         }, 50);
 
-        return {start, canMove, dragRef, closeDialog, _mousedown, _mouseup, _mousemove};
+        return {start, canMove, dragRef, closeDialog, mousedown, mouseup, mousemove};
     }
 }
 </script>

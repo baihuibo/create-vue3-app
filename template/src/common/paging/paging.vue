@@ -3,7 +3,7 @@
         <div>共 {{ total }} 条</div>
         <div>
             每页
-            <select v-model="pageSize" @change="_selectRefresh($event.target.value)">
+            <select v-model="pageSize" @change="selectRefresh($event.target.value)">
                 <option value="15">15</option>
                 <option value="30">30</option>
                 <option value="50">50</option>
@@ -14,27 +14,27 @@
 
         <a class="paging-item"
            :class="{disabled:currentPage === 1}"
-           @click="_goPage(currentPage - 1)"> &lt;
+           @click="goPage(currentPage - 1)"> &lt;
         </a>
 
-        <template v-for="item in _pageItemsRef">
+        <template v-for="item in pageItemsRef">
             <a href="javascript:" class="paging-item"
                :class="{active : item.pageIndex === currentPage}"
-               @click="_goPage(item.pageIndex)"
+               @click="goPage(item.pageIndex)"
                v-if="item.pageIndex">{{ item.pageIndex }}</a>
             <span v-else>{{ item.text }}</span>
         </template>
 
         <a class="paging-item"
            :class="{disabled:currentPage === totalPage}"
-           @click="_goPage(currentPage + 1)"> &gt;
+           @click="goPage(currentPage + 1)"> &gt;
         </a>
 
         <div>
             前往
-            <input type="text" v-model="_goPageRef" @keyup.enter="_goPage(_goPageRef)">
+            <input type="text" v-model="goPageRef" @keyup.enter="goPage(goPageRef)">
             页
-            <a href="javascript:" v-if="_goPageRef" @click="_goPage(_goPageRef)">确定</a>
+            <a href="javascript:" v-if="goPageRef" @click="goPage(goPageRef)">确定</a>
         </div>
     </div>
 </template>
@@ -61,8 +61,8 @@ export default {
         const pageSize = ref(props.pageSize || 15);
         const currentPage = ref(1);
         const orderNum = ref(0);
-        const _goPageRef = ref('');
-        const _pageItemsRef = ref([]);
+        const goPageRef = ref('');
+        const pageItemsRef = ref([]);
         const cacheParamsRef = ref(); // 上一次查询参数缓存
 
         /**
@@ -73,7 +73,7 @@ export default {
          */
         async function query(params, pageIndex = 1) {
             params = JSON.parse(JSON.stringify(params || {}));// clone
-            params = _cleanEmpty(params);
+            params = cleanEmpty(params);
             let getData;
             if (props.url) {
                 const ajax = props.method === 'get' ? get : post;
@@ -99,7 +99,7 @@ export default {
 
             if (+result.code === 0) {
                 cacheParamsRef.value = params; // 缓存参数
-                _goPageRef.value = '';
+                goPageRef.value = '';
                 const data = result.data;
 
                 // 设置组件数据
@@ -108,7 +108,7 @@ export default {
                 total.value = Math.abs(data.total);
                 currentPage.value = pageIndex;
                 orderNum.value = params.pageSize * (pageIndex - 1);
-                _pageItemsRef.value = createItems(totalPage.value, pageIndex);
+                pageItemsRef.value = createItems(totalPage.value, pageIndex);
             } else {
                 await modal.alert(result.msg);
             }
@@ -125,7 +125,7 @@ export default {
             return result;
         }
 
-        function _cleanEmpty(params) {
+        function cleanEmpty(params) {
             const data = {};
             Object.keys(params).forEach(key => {
                 if (params[key] !== '' && params[key] != null) {
@@ -159,7 +159,7 @@ export default {
          * @param pageIndex
          * @private
          */
-        function _goPage(pageIndex) {
+        function goPage(pageIndex) {
             if (/^\d+$/.test(pageIndex)) {
                 if (pageIndex < 1) {
                     pageIndex = 1;
@@ -171,7 +171,7 @@ export default {
                     return;
                 }
 
-                _goPageRef.value = null;
+                goPageRef.value = null;
                 query(cacheParamsRef.value, pageIndex);
             }
         }
@@ -181,7 +181,7 @@ export default {
          * @param size
          * @private
          */
-        function _selectRefresh(size) {
+        function selectRefresh(size) {
             pageSize.value = size;
             if (total.value > size || totalPage.value > 1) { // 优化，如果没有需要根据size分页的数据，则不进行查询
                 query(cacheParamsRef.value);
@@ -195,9 +195,9 @@ export default {
 
         return {
             props, cacheParamsRef,
-            rollback, refresh, query, _goPage, _selectRefresh,
+            rollback, refresh, query, goPage, selectRefresh,
             list, total, totalPage, pageSize, currentPage, orderNum,
-            _goPageRef, _pageItemsRef, addQueryListen
+            goPageRef, pageItemsRef, addQueryListen
         }
     }
 }
