@@ -3,6 +3,7 @@ import formInterface from './forms/form-interface.vue';
 import formItem from './forms/form-item.vue';
 import userShow from './user-show/user-show.vue';
 import permission from './permission/permission.directive';
+import router from "../router.config.js";
 
 export default function (Vue) {
     Vue.component('paging', paging);
@@ -10,4 +11,5 @@ export default function (Vue) {
     Vue.component('formItem', formItem);
     Vue.component('userShow', userShow);
     Vue.directive('permission', permission);
+    Vue.use(router);
 }
