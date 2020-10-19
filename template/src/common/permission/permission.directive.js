@@ -11,11 +11,11 @@ export default {
 }
 
 function doPermission(el, arg, show) {
-    if (el._promission) {
+    if (el[arg]) {
         setStyle();
         return;
     }
-    el._promission = true;
+    el[arg] = true;
     findPermission(arg, setStyle);
 
     function setStyle(map = cache) {
