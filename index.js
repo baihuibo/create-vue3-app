@@ -13,7 +13,7 @@ async function init() {
     await fs.ensureDir(root)
     const existing = await fs.readdir(root)
     if (existing.length) {
-        console.error(`Error: target directory is not empty.`)
+        console.error('Error: target directory is not empty.')
         process.exit(1)
     }
 
@@ -47,8 +47,8 @@ async function init() {
     if (root !== cwd) {
         console.log(`  cd ${path.relative(cwd, root)}`)
     }
-    console.log(`  npm install (or \`yarn\`)`)
-    console.log(`  npm run dev (or \`yarn dev\`)`)
+    console.log('  npm install (or `yarn`)')
+    console.log('  npm run dev (or `yarn dev`)');
     console.log()
 }
 

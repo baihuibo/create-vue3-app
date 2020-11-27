@@ -98,61 +98,73 @@
     </div>
 </template>
 
-<script setup>
+<script>
 import {reactive, ref} from "vue";
 import {singleThreadWrapFn} from "../../util";
 
-export const form = ref({});
-export const pagingRef = ref({});
-export const dataRef = reactive({
-    text: "111",
-    select: "3",
-    select2: "",
-    number: 123.12,
-    "date": "",
-    "start": "2020-07-18",
-    "end": "",
-    checkbox: ['1'],
-    radio: "1",
-    id: "3232",
-    name: "白慧波",
-    pageSize: 20
-});
-export const list = [
-    {"valueCode": 1, "valueName": "第一行"},
-    {"valueCode": 2, "valueName": "第二行"},
-    {"valueCode": 3, "valueName": "第三行"},
-    {"valueCode": 4, "valueName": "第四行"},
-]
+export default {
+    setup() {
+        const form = ref({});
+        const pagingRef = ref({});
+        const dataRef = reactive({
+            text: "111",
+            select: "3",
+            select2: "",
+            number: 123.12,
+            "date": "",
+            "start": "2020-07-18",
+            "end": "",
+            checkbox: ['1'],
+            radio: "1",
+            id: "3232",
+            name: "白慧波",
+            pageSize: 20
+        });
+        const list = [
+            {"valueCode": 1, "valueName": "第一行"},
+            {"valueCode": 2, "valueName": "第二行"},
+            {"valueCode": 3, "valueName": "第三行"},
+            {"valueCode": 4, "valueName": "第四行"},
+        ]
 
-export function change() {
+        function change() {
 
-}
+        }
 
-// 触发查询
-export const doQuery = singleThreadWrapFn(async (data) => {
-    pagingRef.value.query(data);
-});
+        // 触发查询
+        const doQuery = singleThreadWrapFn(async (data) => {
+            pagingRef.value.query(data);
+        });
 
-export function changeParam() {
-    dataRef.text = "已经发生改变";
-    dataRef.number = 2;
-    dataRef.checkbox = ["1", "4"];
-    dataRef.select = "1";
-    dataRef.radio = "1";
-    dataRef.date = "2020-3-4";
-    dataRef.start = "2020-5-6";
-    dataRef.end = "2020-6-7";
-    dataRef.id = "3232";
-    dataRef.name = "白慧波";
-}
+        function changeParam() {
+            dataRef.text = "已经发生改变";
+            dataRef.number = 2;
+            dataRef.checkbox = ["1", "4"];
+            dataRef.select = "1";
+            dataRef.radio = "1";
+            dataRef.date = "2020-3-4";
+            dataRef.start = "2020-5-6";
+            dataRef.end = "2020-6-7";
+            dataRef.id = "3232";
+            dataRef.name = "白慧波";
+        }
 
-export function responseHandler() {
+        function responseHandler() {
 
-}
+        }
 
-export function beforeSend(param) {
-    return param; //将改变后的请求参数return  --注意:格式不能发生变化
+        function beforeSend(param) {
+            return param; //将改变后的请求参数return  --注意:格式不能发生变化
+        }
+
+        return {
+            list, dataRef, pagingRef, form,
+            change, doQuery,
+            changeParam,
+            responseHandler,
+            beforeSend
+        }
+    }
 }
 </script>
 

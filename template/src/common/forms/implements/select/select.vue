@@ -29,7 +29,7 @@
     </div>
 </template>
 
-<script setup="props,{emit}">
+<script>
 import {nextTick, onMounted, ref, watchEffect} from "vue";
 import {getKeyCodes} from "../../util";
 import {registerValidate} from "../../form-validator";
@@ -46,183 +46,191 @@ export default {
         keyCode: String,
         validateRule: Object,
         lazeload: Boolean,  //懒加载
-    }
-}
+    },
+    setup(props, {emit}) {
+        const viewValue = ref('')
+        const dropdownRef = ref()
+        const dropdownShowRef = ref(false)
+        const listRef = ref([])
+        const elementRef = ref()
+        const searchText = ref('');
+        const selecteds = ref([]);
 
-export const viewValue = ref('')
-export const dropdownRef = ref()
-export const dropdownShowRef = ref(false)
-export const listRef = ref([])
-export const elementRef = ref()
-export const searchText = ref('');
-export const selecteds = ref([]);
+        let canBlur = true;
+        let canLoad = false;
 
-let canBlur = true;
-let canLoad = false;
+        registerValidate({ref: elementRef, props})
 
-registerValidate({ref: elementRef, props})
-
-onMounted(async () => {
-    const modelValue = getModelValue();
-    if (props.keyCode) {
-        if (modelValue.length || !props.lazeload) {
-            listRef.value = (await getKeyCodes(props.keyCode)).data || [];
-        } else {
-            canLoad = true
-        }
-    } else {
-        listRef.value = props.list || [];
-    }
-    selecteds.value = modelValue;
-    setViewValue()
-})
-
-watchEffect(async () => {
-    let setVal = 0;
-    if (Array.isArray(props.list) && props.list.length && listRef.value !== props.list) {
-        listRef.value = props.list;
-        setVal = 1;
-    }
-    if (selecteds.value.toString() !== getModelValue().toString()) {
-        selecteds.value = getModelValue().slice(0);
-        await loadData();
-        setVal = 1;
-    }
-    setVal && setViewValue();
-})
-
-export function dropdownOpen() {
-    if (!dropdownShowRef.value) {
-        loadData()
-        dropdownShowRef.value = true;
-        nextTick(() => {
-            if (dropdownRef.value) {
-                dropdownRef.value.focus()
-            }
-        })
-    } else {
-        rollBackData();
-    }
-}
-
-export function dropdownBlur() {
-    setTimeout(() => {
-        if (canBlur) {
-            rollBackData()
-        }
-    })
-}
-
-export function searchFocus() {
-    canBlur = false;
-}
-
-export function searchBlur() {
-    canBlur = true
-    setTimeout(() => {
-        // document.activeElement返回当前页面获取焦点的元素
-        if (document.activeElement !== dropdownRef.value) {
-            rollBackData()
-        }
-    })
-}
-
-export function toggleSelected(item) {
-    let modelValue = selecteds.value || [];
-    if (item) {
-        const {valueCode} = item;
-        if (!props.multiple) {
-            close();
-            if (modelValue.length === 1 && _eq(modelValue[0], valueCode)) {
-                return;
-            }
-            modelValue = [valueCode];
-        } else {
-            const index = modelValue.findIndex(item => _eq(item, valueCode));
-            if (index > -1) {
-                modelValue.splice(index, 1)
+        onMounted(async () => {
+            const modelValue = getModelValue();
+            if (props.keyCode) {
+                if (modelValue.length || !props.lazeload) {
+                    listRef.value = (await getKeyCodes(props.keyCode)).data || [];
+                } else {
+                    canLoad = true
+                }
             } else {
-                modelValue.push(valueCode)
+                listRef.value = props.list || [];
+            }
+            selecteds.value = modelValue;
+            setViewValue()
+        })
+
+        watchEffect(async () => {
+            let setVal = 0;
+            if (Array.isArray(props.list) && props.list.length && listRef.value !== props.list) {
+                listRef.value = props.list;
+                setVal = 1;
+            }
+            if (selecteds.value.toString() !== getModelValue().toString()) {
+                selecteds.value = getModelValue().slice(0);
+                await loadData();
+                setVal = 1;
+            }
+            setVal && setViewValue();
+        })
+
+        function dropdownOpen() {
+            if (!dropdownShowRef.value) {
+                loadData()
+                dropdownShowRef.value = true;
+                nextTick(() => {
+                    if (dropdownRef.value) {
+                        dropdownRef.value.focus()
+                    }
+                })
+            } else {
+                rollBackData();
             }
         }
-    } else {
-        close();
-        modelValue = [];
-    }
-    selecteds.value = modelValue;
 
-    const value = props.multiple ? modelValue : modelValue[0];
-    const labels = listRef.value.filter(a => isSelect(a.valueCode)).map(a => a.valueName);
-
-    emit('update:modelValue', value);
-    emit('update:label', props.multiple ? labels : labels[0]);
-    emit('change', value);
-
-    setViewValue()
-
-    function close() {
-        nextTick(rollBackData);
-    }
-}
-
-async function loadData() {
-    if (!canLoad) {
-        return
-    }
-    canLoad = false;
-    listRef.value = (await getKeyCodes(props.keyCode)).data || [];
-}
-
-let oldSearchText, filterList;
-
-// 过滤列表
-export function filter(searchText = '') {
-    searchText = searchText.trim();
-    if (searchText) {
-        if (oldSearchText !== searchText) {
-            oldSearchText = searchText;
-            filterList = listRef.value.filter(a => a.valueName.includes(searchText))
+        function dropdownBlur() {
+            setTimeout(() => {
+                if (canBlur) {
+                    rollBackData()
+                }
+            })
         }
-        return filterList;
-    }
-    return listRef.value;
-}
 
-function setViewValue() {
-    const modelValue = selecteds.value;
-    if (modelValue.length) {
-        if (modelValue.length > 4) {
-            viewValue.value = `已选中${modelValue.length}个`
-        } else {
-            viewValue.value = listRef.value.filter(a => isSelect(a.valueCode)).map(a => a.valueName).join('、');
+        function searchFocus() {
+            canBlur = false;
         }
-    } else {
-        viewValue.value = ''
+
+        function searchBlur() {
+            canBlur = true
+            setTimeout(() => {
+                // document.activeElement返回当前页面获取焦点的元素
+                if (document.activeElement !== dropdownRef.value) {
+                    rollBackData()
+                }
+            })
+        }
+
+        function toggleSelected(item) {
+            let modelValue = selecteds.value || [];
+            if (item) {
+                const {valueCode} = item;
+                if (!props.multiple) {
+                    close();
+                    if (modelValue.length === 1 && _eq(modelValue[0], valueCode)) {
+                        return;
+                    }
+                    modelValue = [valueCode];
+                } else {
+                    const index = modelValue.findIndex(item => _eq(item, valueCode));
+                    if (index > -1) {
+                        modelValue.splice(index, 1)
+                    } else {
+                        modelValue.push(valueCode)
+                    }
+                }
+            } else {
+                close();
+                modelValue = [];
+            }
+            selecteds.value = modelValue;
+
+            const value = props.multiple ? modelValue : modelValue[0];
+            const labels = listRef.value.filter(a => isSelect(a.valueCode)).map(a => a.valueName);
+
+            emit('update:modelValue', value);
+            emit('update:label', props.multiple ? labels : labels[0]);
+            emit('change', value);
+
+            setViewValue()
+
+            function close() {
+                nextTick(rollBackData);
+            }
+        }
+
+        async function loadData() {
+            if (!canLoad) {
+                return
+            }
+            canLoad = false;
+            listRef.value = (await getKeyCodes(props.keyCode)).data || [];
+        }
+
+        let oldSearchText, filterList;
+
+        // 过滤列表
+        function filter(searchText = '') {
+            searchText = searchText.trim();
+            if (searchText) {
+                if (oldSearchText !== searchText) {
+                    oldSearchText = searchText;
+                    filterList = listRef.value.filter(a => a.valueName.includes(searchText))
+                }
+                return filterList;
+            }
+            return listRef.value;
+        }
+
+        function setViewValue() {
+            const modelValue = selecteds.value;
+            if (modelValue.length) {
+                if (modelValue.length > 4) {
+                    viewValue.value = `已选中${modelValue.length}个`
+                } else {
+                    viewValue.value = listRef.value.filter(a => isSelect(a.valueCode)).map(a => a.valueName).join('、');
+                }
+            } else {
+                viewValue.value = ''
+            }
+        }
+
+        function rollBackData() {
+            dropdownShowRef.value = false;
+            searchText.value = '';
+            filterList = []
+        }
+
+        function getModelValue() {
+            const {modelValue} = props;
+            if (props.multiple) {
+                return modelValue || [];
+            } else if (modelValue != null && modelValue !== '' && !isNaN(modelValue)) {
+                return [modelValue];
+            }
+            return []
+        }
+
+        function isSelect(code) {
+            return selecteds.value.findIndex(a => _eq(a, code)) > -1;
+        }
+
+        function _eq(a, b) {
+            return a == b;
+        }
+
+        return {
+            viewValue, dropdownRef, dropdownShowRef,
+            listRef, elementRef, searchText, selecteds,
+            filter, dropdownOpen, dropdownBlur, isSelect,
+            searchFocus, searchBlur, toggleSelected,
+        }
     }
-}
-
-function rollBackData() {
-    dropdownShowRef.value = false;
-    searchText.value = '';
-    filterList = []
-}
-
-function getModelValue() {
-    const {modelValue} = props;
-    if (props.multiple) {
-        return modelValue || [];
-    } else if (modelValue != null && modelValue !== '' && !isNaN(modelValue)) {
-        return [modelValue];
-    }
-    return []
-}
-
-export function isSelect(code) {
-    return selecteds.value.findIndex(a => _eq(a, code)) > -1;
-}
-
-function _eq(a, b) {
-    return a == b;
 }
 </script>
 

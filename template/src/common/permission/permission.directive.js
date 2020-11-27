@@ -1,4 +1,4 @@
-import {post} from "../../util";
+import {debounce, post} from "../../util";
 import {nextTick} from 'vue';
 
 export default {
@@ -11,51 +11,17 @@ export default {
 }
 
 function doPermission(el, arg, show) {
-    const matchs = arg.match(PermissionExecReg) || []; // 找到所有的权限
+    const matches = arg.match(PermissionExecReg) || []; // 找到所有的权限
 
     // 查询权限编码，然后设置样式
-    findPermission(matchs, setStyle);
-
-    function setStyle() {
+    findPermission(matches, function () {
         // 开发环境时，默认所有权限都为true
         // 非开发环境时，需要根据权限调整元素显示
         if (process.env.NODE_ENV === 'development') {
             return;
         }
-
-        if (!hasPermission(matchs) && el.style) {
-            el.tabIndex = -1;
-            el.style.pointerEvents = 'none';
-            el.style.color = '#c1c1c1';
-            if (!show) {
-                el.style.display = 'none';
-                el.classList.add('hide');
-            }
-        }
-    }
-
-    /**
-     * 将表达式构建成一个函数
-     * @example
-     *  arg = 'AAA:BBB'
-     *  buildFn() => 'function fn(){ return true }'
-     * @example
-     *  arg = 'AAA:BBB || BBB:CC && AA:CC && !DD:FA'
-     *  buildFn() => 'function fn(){ return true || true && false && !false }'
-     *  @param matchs {String[]}
-     * @return {Function}
-     */
-    function hasPermission(matchs) {
-        let fn = calcFnCache[arg];
-        if (!fn) {
-            let fnBody = arg;
-            matchs.forEach(e => {
-                fnBody = fnBody.replace(new RegExp(e, 'g'), PermissionCacheMap[e]);
-            });
-            fn = calcFnCache[arg] = Function(`return !!(${fnBody})`);
-        }
-        return fn();
-    }
+        setStyleFn(el, arg, show, matches);
+    });
 }
 
 // 查询权限
@@ -66,7 +32,7 @@ let codeQueues = new Set(), // 查询队列
     PermissionCacheMap = {}, // 权限数据缓存
     calcFnCache = {}, // 计算权限函数缓存
     requestCache = {}, // 权限查询对象缓存
-    timer;
+    querying;
 
 function findPermission(matchCodes, cb) {
     // 过滤缓存中已经存在的权限
@@ -89,11 +55,11 @@ function findPermission(matchCodes, cb) {
     });
     callbackQueues.push(cb); // 但是无论是否查询，回调函数总是需要触发
 
-    if (timer) return;
+    if (querying) return;
 
-    timer = 1;
+    querying = 1;
     nextTick(async () => {
-        timer = 0;
+        querying = 0;
         const searchCodes = Array.from(codeQueues);
         const lazeCodes = Array.from(lazeCodeQueues);
         const cbFns = callbackQueues.slice(0);
@@ -120,4 +86,41 @@ function findPermission(matchCodes, cb) {
         cbFns.forEach(fn => fn());
         cbFns.length = 0;
     });
+}
+
+// 防抖函数优化样式设置
+function setStyleFn(el, arg, show, matches) {
+    if (!hasPermission(matches, arg) && el.style) {
+        if (show) {
+            el.tabIndex = -1;
+            el.style.cssText = 'pointer-events:none;color:#c1c1c1;user-select:none;';
+        } else {
+            el.style.display = 'none';
+            el.classList.add('hide');
+        }
+    }
+}
+
+/**
+ * 将表达式构建成一个函数
+ * @example
+ *  arg = 'AAA:BBB'
+ *  buildFn() => 'function fn(){ return true }'
+ * @example
+ *  arg = 'AAA:BBB || BBB:CC && AA:CC && !DD:FA'
+ *  buildFn() => 'function fn(){ return true || true && false && !false }'
+ * @param matchs {String[]}
+ * @param arg String
+ * @return {Function}
+ */
+function hasPermission(matchs, arg) {
+    let fn = calcFnCache[arg];
+    if (!fn) {
+        let fnBody = arg;
+        matchs.forEach(e => {
+            fnBody = fnBody.replace(new RegExp(e, 'g'), PermissionCacheMap[e]);
+        });
+        fn = calcFnCache[arg] = Function(`return !!(${fnBody})`);
+    }
+    return fn();
 }
