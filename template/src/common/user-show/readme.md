@@ -10,8 +10,13 @@
     </div>
 </template>
 
-<script setup>
-export const name = '用户名';
-export const id = '用户id';
+<script>
+export default {
+  setup(){
+    const name = '用户名';
+    const id = '用户id';
+    return {name , id};
+  }
+}
 </script>
 ```
