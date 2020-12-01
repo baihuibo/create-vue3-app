@@ -12,7 +12,7 @@ export async function ajax(url, body, method = 'get') {
     };
     if (body && body instanceof FormData) {
         config.headers = {}; // 文件上传不需要手动设置 header
-    } else if (typeof body === 'object' && /post/i.test(method)) {
+    } else if (typeof body === 'object' && /post|put/i.test(method)) {
         config.body = JSON.stringify(body);
         config.headers = {'Content-Type': 'application/json'};
     } else if (typeof body === 'string') {
@@ -35,17 +35,30 @@ export async function ajax(url, body, method = 'get') {
     }
 }
 
+export function get(url, params) {
+    url = addParams(url, params);
+    return ajax(url);
+}
 
 export function post(url, body) {
     return ajax(url, body, 'post');
 }
 
-export function get(url, params) {
+export function put(url, body) {
+    return ajax(url, body, 'put');
+}
+
+export function del(url, params) {
+    url = addParams(url, params);
+    return ajax(url, null, 'delete');
+}
+
+function addParams(url, params) {
     if (params) {
         const search = Object.keys(params).map(name => name + '=' + params[name]).join('&');
         url += (url.includes('?') ? '&' : '?') + search;
     }
-    return ajax(url);
+    return url;
 }
 
 export function formSubmit(action, data, method = 'get') {
