@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import {modal} from "../modal/modal";
+import {modal} from "../../../modal/modal";
 
 export default {
     props: ['userName', 'userId'],

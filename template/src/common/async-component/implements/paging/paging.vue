@@ -41,11 +41,10 @@
 
 <script>
 import {ref} from 'vue';
-import {get, post} from "../../util";
-import {modal} from "../modal/modal";
+import {get, post} from "../../../../util";
+import {modal} from "../../../modal/modal";
 
 export default {
-    name: "paging",
     props: {
         url: String,
         method: String,

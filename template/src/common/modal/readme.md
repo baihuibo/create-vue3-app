@@ -18,14 +18,14 @@ const openModal = async () => {
 
 openModal(); // 打开弹窗
 
-// 2. 通过 modal.alert 打开提示弹窗，await 可以在 async 方法中阻塞后续代码执行
-await modal.alert('打开一个带有关闭按钮的alert','自定义标题'); 
+// 2. 通过 modal.alert 打开提示弹窗，await 可以在 async-component 方法中阻塞后续代码执行
+await modal.alert('打开一个带有关闭按钮的alert','自定义标题');
 
 // 3. 通过 modal.confirm 打开确认提示弹窗
 const res = await modal.alert('打开一个带有确认和关闭按钮的confirm', '确认框标题');
 if(res){
    console.log('确认操作');
-} 
+}
 
 // 4 通过 modal.showLoading / modal.hideLoading 打开/关闭 遮罩层
 modal.showLoading(); // 打开
@@ -38,11 +38,11 @@ modal.hideLoading(); // 关闭
     <div> <!-- 最好使用单根节点 -->
 
         <!-- 这里可以输出 `abc` -->
-        <div>{{data.name}}</div> 
+        <div>{{data.name}}</div>
 
         <!-- 内置样式 .dialog-footer -->
-        <div class="dialog-footer"> 
-            
+        <div class="dialog-footer">
+
             <!-- $emit('close') 触发关闭事件 -->
             <!-- $emit('close', data) 触发关闭事件，可携带返回数据 -->
             <!-- 按钮样式根据需要可自定义 -->

@@ -94,7 +94,9 @@
             </tr>
             </tbody>
         </table>
-        <paging url="/bdc/layout/queryList.htm" ref="pagingRef"/>
+        <async-component type="paging"
+                         url="/bdc/layout/queryList.htm"
+                         @load="pagingRef = $event"/>
     </div>
 </template>
 
