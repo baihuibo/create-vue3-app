@@ -117,7 +117,7 @@ export default {
             checkbox: ['1'],
             radio: "1",
             id: "3232",
-            name: "白慧波",
+            name: "小白",
             pageSize: 20
         });
         const list = [

@@ -1,5 +1,5 @@
 <template>
-    <component :is="'v-' + type" :validate-rule="validateRule" flex></component>
+    <component :is="'v-' + type" flex/>
 </template>
 
 <script>
@@ -7,7 +7,7 @@ import {defineAsyncComponent} from "vue";
 
 export default {
     name: "form-item",
-    props: ['type', 'validateRule'],
+    props: ['type'],
     components: {
         'v-text': defineAsyncComponent(() => import("./implements/text/text.vue")),
         'v-select': defineAsyncComponent(() => import("./implements/select/select.vue")),

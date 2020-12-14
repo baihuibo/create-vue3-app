@@ -11,7 +11,7 @@ import validates from './validates';
 export function registerValidate({ref: elementRef, props, valueKey = 'modelValue'}, ...otherProps) {
 
     let oldValue, oldRule, initialize = false,
-        instance = getCurrentInstance();
+        currentInstance = getCurrentInstance();
 
     watchEffect(trigger);
     onUpdated(trigger);
@@ -20,7 +20,8 @@ export function registerValidate({ref: elementRef, props, valueKey = 'modelValue
         if (!init()) {
             return;
         }
-        if (getNode(elementRef).disabled) { // 被禁用时，跳过验证
+        const node = getNode(elementRef);
+        if (!node || node.disabled) { // 被禁用时，跳过验证
             return;
         }
         const newValue = props[valueKey];
@@ -43,7 +44,7 @@ export function registerValidate({ref: elementRef, props, valueKey = 'modelValue
         if (!node || !node.form) {
             return;
         }
-        patchForm(node.form, {instance, elementRef, props, valueKey, otherProps});
+        patchForm(node.form, currentInstance, elementRef, props, valueKey, otherProps);
         initialize = true;
         return initialize;
     }
@@ -52,7 +53,7 @@ export function registerValidate({ref: elementRef, props, valueKey = 'modelValue
     onBeforeUnmount(() => {
         const node = getNode(elementRef);
         if (node && node.form) {
-            unPatchForm(node.form, instance);
+            unPatchForm(node.form, currentInstance);
         }
     })
 }
@@ -64,12 +65,12 @@ function getNode(ref) {
     return ref.value.nodeType === 1 ? ref.value : ref.value[0]
 }
 
-function patchForm(form, item) {
+function patchForm(form, instance, elementRef, props, valueKey, otherProps) {
     if (form._patched) {
-        form._instances.push(item);
+        form._instances.push({instance, elementRef, props, valueKey, otherProps});
         return;
     }
-    form._instances = [item];
+    form._instances = [{instance, elementRef, props, valueKey, otherProps}];
     form._patched = true;
     form.addEventListener('submit', function () {
         form.classList.add('v-submitted');
@@ -135,18 +136,19 @@ function _getRules(rule) {
 }
 
 function _setValidateMsg(ref, msg) {
-    if (ref.value.nodeType === 1) {
-        ref.value.setCustomValidity(msg);
-    } else if (Array.isArray(ref.value) && ref.value.length) {
-        ref.value[0].setCustomValidity(msg);
+    const node = getNode(ref);
+    if (node) {
+        node.setCustomValidity(msg);
     }
 }
 
 function _setRequired(ref, required) {
     const node = getNode(ref);
-    if (node.matches('[type=checkbox],[type=radio]')) {
-        node.setCustomValidity(required ? '请在列表中选择一项。' : '')
-    } else {
-        ref.value.required = required;
+    if (node) {
+        if (node.matches('[type=checkbox],[type=radio]')) {
+            node.setCustomValidity(required ? '请在列表中选择一项。' : '')
+        } else {
+            node.required = required;
+        }
     }
 }

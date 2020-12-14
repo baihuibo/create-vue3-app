@@ -20,7 +20,7 @@ export default {
         start: String,
         end: String,
         config: {},
-        disabled: String,
+        disabled: Boolean,
         validateRule: Object
     },
     setup(props, {emit}) {

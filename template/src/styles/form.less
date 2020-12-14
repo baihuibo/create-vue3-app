@@ -69,6 +69,11 @@ textarea.form-control {
     resize: vertical;
 }
 
-input[type=number].form-control::-webkit-inner-spin-button {
-    display: none;
+input[type=number].form-control {
+    margin: 0;
+    -moz-appearance: textfield; // firefox
+
+    &::-webkit-inner-spin-button { // webkit内核input[number]默认箭头样式
+        -webkit-appearance: none !important;
+    }
 }

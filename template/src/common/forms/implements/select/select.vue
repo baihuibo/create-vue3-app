@@ -41,6 +41,7 @@ export default {
         multiple: Boolean,  //多选
         modelValue: [String, Number, Array],
         label: [String, Array],
+        current: Object, // 当前选中项
         placeholder: {type: String, default: '请选择'},
         noPlaceholder: Boolean,
         keyCode: String,
@@ -128,9 +129,10 @@ export default {
 
         function toggleSelected(item) {
             let modelValue = selecteds.value || [];
+            const multiple = props.multiple;
             if (item) {
                 const {valueCode} = item;
-                if (!props.multiple) {
+                if (!multiple) {
                     close();
                     if (modelValue.length === 1 && _eq(modelValue[0], valueCode)) {
                         return;
@@ -150,11 +152,13 @@ export default {
             }
             selecteds.value = modelValue;
 
-            const value = props.multiple ? modelValue : modelValue[0];
-            const labels = listRef.value.filter(a => isSelect(a.valueCode)).map(a => a.valueName);
+            const value = multiple ? modelValue : modelValue[0];
+            const currents = listRef.value.filter(a => isSelect(a.valueCode));
+            const labels = currents.map(a => a.valueName);
 
             emit('update:modelValue', value);
-            emit('update:label', props.multiple ? labels : labels[0]);
+            emit('update:current', multiple ? currents : currents[0]);
+            emit('update:label', multiple ? labels : labels[0]);
             emit('change', value);
 
             setViewValue()

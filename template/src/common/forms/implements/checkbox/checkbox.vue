@@ -39,8 +39,8 @@ export default {
         })
 
         watchEffect(() => {
-            if (selectedListRef.value.toString() !== props.modelValue.toString()) {
-                selectedListRef.value = props.modelValue.slice(0);
+            if (selectedListRef.value.toString() !== (props.modelValue || '').toString()) {
+                selectedListRef.value = (props.modelValue || []).slice(0);
             }
         });
 
