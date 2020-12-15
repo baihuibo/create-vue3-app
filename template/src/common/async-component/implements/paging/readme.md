@@ -23,7 +23,33 @@
             </tr>
         </tbody>
     </table>
-    <paging url="/bdc/queryList.htm" ref="pagingRef"/>
+    <async-component type="paging"
+        url="/bdc/queryList.htm"
+        @load="pagingRef = $event"/>
+</template>
+
+<script>
+export default {
+    setup(props){
+        // 声明 paging 组件的ref，默认值必须为 {},否则模板中提前使用的变量会报空指针
+        const pagingRef = ref({});
+        const params = reactive({ // 声明参数
+            name : ''
+        });
+
+        return {pagingRef, params}
+    }
+}
+</script>
+```
+
+自动触发首次查询，当提供参数`init-params`且未有效对象参数时，在组件加载就绪后，将自动触发首次查询
+```vue
+<template>
+    <async-component type="paging"
+            url="/bdc/queryList.htm"
+            @load="pagingRef = $event"
+            :init-params="params"/>
 </template>
 
 <script>
@@ -51,13 +77,13 @@ const paging = pagingRef.value;
  * @param index 查询页数，默认1
  * @return {Promise} 返回promise表示查询事件
  **/
-paging.query(params, index).then()
+await paging.query(params, index)
 
 /**
  * 刷新当前页查询，查询参数会自动使用上一次的缓存，在执行修改状态等操作时使用
  * @return {Promise} 返回promise表示查询事件
  **/
-paging.refresh().then()
+await paging.refresh()
 
 /**
  * 将所有状态还原到初始化时
@@ -80,7 +106,10 @@ paging.cacheParamsRef    // 当前页面数据查询参数
     <ul>
         <li v-for="item in pagingRef.list">{{item}}</li>
     </ul>
-    <paging :get-data="getData" ref="pagingRef"/>
+    <async-component type="paging" :get-data="getData"
+                     @load="pagingRef = $event"
+                     :init-params="{}"/>
+    <!-- 等组件初始化完成后，立刻触发查询 -->
 </template>
 
 <script>
@@ -100,9 +129,6 @@ export default {
                 }
             }
         };
-        setTimeout(()=>{// 等组件初始化完成后，即触发查询
-            pagingRef.value.query();
-        })
         return {pagingRef , getData}
     }
 }
@@ -119,6 +145,7 @@ onMounted(async()=>{
     console.log('查询结束')
 })
 ```
+
 <table>
     <thead>
         <tr>
@@ -181,10 +208,12 @@ onMounted(async()=>{
 
  - 其它组件 api doc
 ```html
-<paging ref="pagingRef"
+<async-component type="paging"
+        @load="pagingRef = $event"
         url="/path/to/action"   :url="url"
         method="post"           :method="method"
         :page-size="15"
+        :init-params="{}"
         :get-data="getDataFn"
         :before-send="beforeSendFn"
         :response-handler="responseHandlerFn"/>
@@ -213,6 +242,13 @@ onMounted(async()=>{
             <td>post</td>
             <td>否</td>
             <td>ajax请求类型</td>
+        </tr>
+        <tr>
+            <td>init-params</td>
+            <td>Object</td>
+            <td>null</td>
+            <td>否</td>
+            <td>组件加载完成后自动触发查询的参数</td>
         </tr>
         <tr>
             <td>page-size</td>

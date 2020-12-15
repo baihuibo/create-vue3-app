@@ -6,8 +6,8 @@
 ```vue
 <template>
     <div>
-        <async-comp type="user-show"
-                    :user-name="name" :user-id="id"/>
+        <async-component type="user-show"
+                         :user-name="name" :user-id="id"/>
     </div>
 </template>
 

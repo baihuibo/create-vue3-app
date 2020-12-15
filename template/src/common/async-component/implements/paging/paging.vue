@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import {get, post} from "../../../../util";
 import {modal} from "../../../modal/modal";
 
@@ -51,6 +51,7 @@ export default {
         pageSize: Number,
         getData: Function,
         beforeSend: Function,
+        initParams: Object,
         responseHandler: Function
     },
     setup(props) {
@@ -63,6 +64,12 @@ export default {
         const goPageRef = ref('');
         const pageItemsRef = ref([]);
         const cacheParamsRef = ref(); // 上一次查询参数缓存
+
+        if (props.initParams && typeof props.initParams === 'object') {
+            onMounted(() => {
+                query(props.initParams);
+            });
+        }
 
         /**
          * 查询数据
