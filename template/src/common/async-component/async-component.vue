@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import {defineAsyncComponent, ref, watch} from 'vue';
+import {defineAsyncComponent, getCurrentInstance, ref, warn, watch} from 'vue';
 
 export default {
     components: {
@@ -13,6 +13,10 @@ export default {
     props: ['type'],
     emits: ['load'],
     setup(props, {emit}) {
+        const {type} = getCurrentInstance();
+        if (!type.components['v-' + props.type]) {
+            warn(`无法初始化 <async-component type="${props.type}"> 请检查组件类型`);
+        }
         const iRef = ref();
         const stopWatch = watch(iRef, () => { // 等待实例加载完成
             if (iRef.value) {

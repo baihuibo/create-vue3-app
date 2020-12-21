@@ -135,7 +135,7 @@ export default {
 
         // 触发查询
         const doQuery = singleThreadWrapFn(async (data) => {
-            pagingRef.value.query(data);
+            await pagingRef.value.query(data);
         });
 
         function changeParam() {

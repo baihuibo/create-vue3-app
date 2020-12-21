@@ -17,7 +17,7 @@
 
 <script>
 import {nextTick, ref, watchEffect} from 'vue';
-import {get, post} from "../../../../util";
+import {clone, get, post} from "../../../../util";
 import {debounce} from "../../util";
 import {registerValidate} from "../../form-validator";
 
@@ -153,7 +153,7 @@ export default {
         }
 
         async function query(params, pageIndex = 1) {
-            params = JSON.parse(JSON.stringify(params || {}));// clone
+            params = clone(params || {});
             params.pageSize = props.pageSize || 15;
             showNoResultRef.value = false;
             let getData;

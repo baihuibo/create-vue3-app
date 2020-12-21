@@ -41,7 +41,7 @@
 
 <script>
 import {onMounted, ref} from 'vue';
-import {get, post} from "../../../../util";
+import {clone, get, post} from "../../../../util";
 import {modal} from "../../../modal/modal";
 
 export default {
@@ -78,7 +78,7 @@ export default {
          * @return {Promise<Object>}
          */
         async function query(params, pageIndex = 1) {
-            params = JSON.parse(JSON.stringify(params || {}));// clone
+            params = clone(params || {});// clone
             params = cleanEmpty(params);
             let getData;
             if (props.url) {

@@ -105,6 +105,10 @@ export function debounce(fn, time) {
     }
 }
 
+export function clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
 /**
  * @param fn
  * @param time
@@ -125,11 +129,10 @@ export function throttle(fn, time = 50, last = false) {
     }
 }
 
-
 /**
- * 在异步函数执行完成期间，其它调用则不会触发新的调用
- * 用来避免类似保存、提交 按钮在网络稍有延迟时，被多次点击而导致重复触发请求的问题
- * @param asyncFn
+ * 为了避免类似保存、提交 按钮在网络稍有延迟时，被多次点击而导致重复触发请求的问题
+ * 在异步函数执行完成期间，所有对此函数的调用只会触发一次
+ * @param asyncFn {Function}
  * @return {function(...[*]=)}
  */
 export function singleThreadWrapFn(asyncFn) {
