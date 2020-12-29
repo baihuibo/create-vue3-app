@@ -12,8 +12,8 @@
 
 <script>
 import treeNode from './tree-node.vue';
-import {onUpdated, ref} from "vue";
-import {debounce} from "../../../../util";
+import {onUpdated, ref, watchEffect} from "vue";
+import {throttle} from "../../../../util";
 import {getUuid} from "../../../forms/util";
 
 export default {
@@ -21,7 +21,7 @@ export default {
     props: {
         selectedMulti: Boolean, // 是否支持选中多个节点
         nodes: Array, // 数据
-        rootId: Object, // 根节点id
+        rootId: [Number, String], // 根节点id
         idKey: String, // id
         pidKey: String, // pid
         loadData: Function, // 异步加载数据
@@ -83,14 +83,13 @@ export default {
 
         // 数据初始化
         let cacheNodes;
-        onUpdated(() => {
+        watchEffect(() => {
             if (cacheNodes === props.nodes) {
                 return;
             }
             if (!props.nodes) {
                 return;
             }
-            console.log('update nodes')
             cacheNodes = props.nodes; // 缓存nodes
             if (Array.isArray(props.nodes) && props.nodes.length) {
                 if (props.simpleData) {
@@ -131,9 +130,9 @@ export default {
             }
         });
 
-        const doSearchNode = debounce(function (searchText) {
+        const doSearchNode = function (searchText) {
             searchNodes.value = getNodesBySearchText(rootNodes.value, 'name', searchText);
-        }, 300);
+        };
 
         // 获取全部选中的节点
         const getAllSelectedNodes = function (all) {
