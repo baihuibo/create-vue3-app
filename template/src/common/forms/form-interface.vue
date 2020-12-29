@@ -13,6 +13,9 @@
 
 <script>
 export default {
-    props: ['label', 'required']
+    props: {
+        label: String,
+        required: Boolean
+    }
 }
 </script>

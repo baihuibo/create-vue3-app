@@ -59,13 +59,15 @@ export default {
 
 #### 表单元素示意
 
-- `<form-interfalce>` 一个表单对象容器，可设置 `label` 来显示标签名称
-- `<form-item>` 一个表单元素容器，`type` 为组件类型，具体可参考 `implements` 中组件类型
+- `<form-interfalce>` 一个表单对象容器，
+    - 可设置 `label` 来显示标签名称
+    - 可设置 `required` 来给标签加一个红色的`*`
+- `<form-item>` 一个表单元素容器，`type` 为组件类型，具体参数可参考 `implements` 中组件类型
 
 ```vue
 
 <template>
-    <form-interface label="name:" flex="33">
+    <form-interface label="name:" required flex="33">
         <form-item type="input"
                    v-model="data.name"
                    :validate-rule="{required:false}"/>
