@@ -1,7 +1,8 @@
 #### radio 单选框组件 文档
 
+基本使用
 
-基本使用----keycode 使用
+- `keycode` 使用
 
 ```vue
 <template>
@@ -18,8 +19,8 @@
     }
 </script>
 ```
-基本使用----list 使用
 
+- `list` 使用
 ```vue
 <template>
     <form-item type="radio" v-model="value" :list="listData"/>
@@ -28,7 +29,7 @@
     export default {
         setup(){
            const value = ref(["3"]) //初始化选中数据   --必须是字符串类型
-            const listData = list = [
+            const listData = [
                 {"valueCode":1,"valueName":"第一行"},
                 {"valueCode":2,"valueName":"第二行"},
                 {"valueCode":3,"valueName":"第三行"},
@@ -38,7 +39,8 @@
     }
 </script>
 ```
-基本使用----绑定onchange事件
+
+- 绑定`change`事件
 ```vue
 <template>
     <form-item type="radio" v-mode="value" :keycode="keycode" @change="change"/>

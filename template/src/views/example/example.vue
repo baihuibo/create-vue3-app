@@ -13,7 +13,7 @@
                 </form-interface>
                 <form-interface label="select：" flex="33">
                     <form-item type="select" v-model="dataRef.select" key-code="aaa" @change="change"
-                               :validate-rule="{required:true}"/>
+                               no-search :validate-rule="{required:true}"/>
                 </form-interface>
                 <form-interface label="select lazeload：" flex="33">
                     <form-item type="select" v-model="dataRef.select2" key-code="aaa" lazeload @change="change"

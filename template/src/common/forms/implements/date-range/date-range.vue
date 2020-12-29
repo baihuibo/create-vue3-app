@@ -19,7 +19,7 @@ export default {
     props: {
         start: String,
         end: String,
-        config: {},
+        config: Object,
         disabled: Boolean,
         validateRule: Object
     },

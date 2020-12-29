@@ -15,7 +15,7 @@ import {registerValidate} from "../../form-validator";
 export default {
     props: {
         modelValue: String,
-        config: {},
+        config: Object,
         placeholder: String,
         disabled: Boolean,
         validateRule: Object

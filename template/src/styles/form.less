@@ -48,12 +48,16 @@ fieldset:disabled {
 .form-control {
     border: 1px solid #dbdeef;
     border-radius: 2px;
-    padding: 5px;
+    padding: 9px 10px;
     height: @baseHeight;
     box-sizing: border-box;
     outline: none;
     width: 100%;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+
+    &::placeholder, &::-webkit-input-placeholder {
+        color: #999;
+    }
 
     &:focus, &.focus {
         border-color: #66afe9;

@@ -1,4 +1,4 @@
-import {getCurrentInstance, isRef, onBeforeUnmount, onUpdated, watchEffect} from "vue";
+import {getCurrentInstance, isRef, nextTick, onBeforeUnmount, onUpdated, watchEffect} from "vue";
 import validates from './validates';
 
 /**
@@ -13,14 +13,15 @@ export function registerValidate({ref: elementRef, props, valueKey = 'modelValue
     let oldValue, oldRule, initialize = false,
         currentInstance = getCurrentInstance();
 
-    watchEffect(trigger);
-    onUpdated(trigger);
+    watchEffect(() => nextTick(trigger));
+    onUpdated(() => nextTick(trigger));
 
     async function trigger() {
         if (!init()) {
             return;
         }
         const node = getNode(elementRef);
+
         if (!node || node.disabled) { // 被禁用时，跳过验证
             return;
         }
@@ -105,24 +106,28 @@ function unPatchForm(form, instance) {
 
 async function validator(ref, value, rule) {
     const rules = _getRules(rule);
+    const node = getNode(ref);
+    if (!node) {
+        return;
+    }
 
     for (let i = 0; i < rules.length; i++) {
         const fn = validates[rules[i]];
         if (fn) {
-            const breakMsg = await Promise.resolve(fn(value, rule[rules[i]]));
+            const errorMsg = await Promise.resolve(fn(value, rule[rules[i]]));
             if (rules[i] === 'required') {
-                _setRequired(ref, !!breakMsg); // 设置required的状态
-                if (breakMsg) {
+                _setRequired(node, !!errorMsg); // 设置required的状态
+                if (errorMsg) {
                     return;
                 }
-            } else if (breakMsg) {
-                _setValidateMsg(ref, breakMsg);
+            } else if (errorMsg) {
+                node.setCustomValidity(errorMsg)
                 return;
             }
         }
     }
 
-    _setValidateMsg(ref, ''); // 清空校验
+    node.setCustomValidity('');// 清空校验
 }
 
 function _getRules(rule) {
@@ -135,20 +140,10 @@ function _getRules(rule) {
     return list;
 }
 
-function _setValidateMsg(ref, msg) {
-    const node = getNode(ref);
-    if (node) {
-        node.setCustomValidity(msg);
-    }
-}
-
-function _setRequired(ref, required) {
-    const node = getNode(ref);
-    if (node) {
-        if (node.matches('[type=checkbox],[type=radio]')) {
-            node.setCustomValidity(required ? '请在列表中选择一项。' : '')
-        } else {
-            node.required = required;
-        }
+function _setRequired(node, required) {
+    if (node.matches('[type=checkbox],[type=radio]')) {
+        node.setCustomValidity(required ? '请选择必选项。' : '')
+    } else {
+        node.required = required;
     }
 }

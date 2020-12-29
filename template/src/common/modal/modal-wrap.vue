@@ -9,7 +9,7 @@
                      v-if="!noTitle"
                      @mousedown="mousedown">
                     {{ title }}
-                    <a href="javascript:" @click="closeDialog()" @mousedown.stop class="modal-close">&times;</a>
+                    <a href="javascript:" @click="closeDialog()" @mousedown.stop class="modal-close">关闭</a>
                 </div>
                 <div class="dialog-body" flex>
                     <modal-body :data="data" @close="closeDialog($event)"></modal-body>
@@ -93,7 +93,6 @@ export default {
 
     .modal-dialog {
         margin: 50px auto 30px;
-        background: #ffffff;
         box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
 
         // 全屏幕
@@ -110,19 +109,47 @@ export default {
             height: 100%;
 
             .modal-header {
-                background-color: #4377de;
-                padding: 0 15px;
-                border-bottom: 1px solid #e5e5e5;
-                color: #fff;
+                background-color: #fff;
+                padding: 15px 20px;
+                border-bottom: 1px solid #DAE3EB;
+                color: #3B4141;
                 cursor: move;
+                font-size: 16px;
+                line-height: 16px;
+                border-radius: 4px 4px 0 0;
             }
 
             .modal-close {
                 text-decoration: none;
-                color: #fff;
-                font-weight: 800;
-                font-size: 30px;
+                color: #9DA0A0;
+                font-weight: bold;
+                font-size: 14px;
                 cursor: pointer;
+                display: inline-block;
+                position: relative;
+                padding-left: 1em;
+
+                &:hover {
+                    color: #000;
+                }
+
+                &:before, &:after {
+                    content: '';
+                    position: absolute;
+                    left: 2px;
+                    top: 1px;
+                    width: 2px;
+                    height: 14px;
+                    background: currentColor;
+                }
+
+                &:before {
+                    transform: rotate(45deg);
+                }
+
+                &:after {
+                    transform: rotate(-45deg);
+                }
             }
 
             .no-title-close {
@@ -147,10 +174,16 @@ export default {
             .dialog-body {
                 padding: 15px 20px;
                 font-size: 12px;
+                background-color: #fff;
+                border-radius: 0 0 4px 4px;
             }
 
             ::v-deep(.dialog-footer) {
-                padding-top: 15px;
+                padding: 12px 30px;
+                margin: 15px -20px -15px;
+                border-radius: 0 0 4px 4px;
+
+                background: #F3F5F8;
                 text-align: center;
             }
         }
@@ -162,7 +195,8 @@ export default {
         transition: opacity .1s linear;
 
         .modal-dialog {
-            transition: transform .3s ease-out;
+            will-change: transform, transition;
+            transition: transform .15s ease;
             transform: translate(0, -25%);
         }
     }

@@ -1,8 +1,7 @@
 #### number 数字文本框组件 文档
 
-
 基本使用
-
+- `to-fixed` 保留几位小数
 ```vue
 <template>
     <form-item type="number" v-mode="value" :to-fixed="2"/>
@@ -17,6 +16,3 @@
     }
 </script>
 ```
-
-# to-fixed
-保留几位小数

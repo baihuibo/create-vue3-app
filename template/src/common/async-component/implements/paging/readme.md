@@ -42,8 +42,7 @@ export default {
 }
 </script>
 ```
-
-自动触发首次查询，当提供参数`init-params`且未有效对象参数时，在组件加载就绪后，将自动触发首次查询
+- `init-params` 在组件加载就绪后，将自动触发首次查询
 ```vue
 <template>
     <async-component type="paging"
@@ -135,7 +134,7 @@ export default {
 </script>
 ```
 
- - 组件 ref api
+- 组件 ref api
 ```js
 const pagingRef = ref({}); // 声明 paging 组件的ref
 onMounted(async()=>{
@@ -206,7 +205,7 @@ onMounted(async()=>{
     </tbody>
 </table>
 
- - 其它组件 api doc
+- 其它组件 api doc
 ```html
 <async-component type="paging"
         @load="pagingRef = $event"

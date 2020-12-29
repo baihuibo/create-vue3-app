@@ -5,17 +5,14 @@
                 {{ label }}
             </div>
         </slot>
-        <div class="form-container" flex>
-            <div layout="row" layout-align="start center">
-                <slot flex/>
-            </div>
+        <div class="form-container" flex layout="row" layout-align="start center">
+            <slot flex/>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    name: "form-interface",
     props: ['label', 'required']
 }
 </script>

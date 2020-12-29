@@ -3,7 +3,7 @@
         <input ref="elementRef" class="form-control" :class="dropdownShowRef ? 'open' : ''"
                type="text" :value="viewValue"
                :placeholder="noPlaceholder !== true ? placeholder : ''" :disabled="disabled"
-               @keydown.prevent.stop @pause.prevent.stop @cut.prevent.stop @mousedown.prevent.stop
+               @keydown.prevent.stop @paste.prevent.stop @cut.prevent.stop @mousedown.prevent.stop
                @click="dropdownOpen">
         <div ref="dropdownRef" class="dropdown" tabindex="-1" v-if="dropdownShowRef" @blur="dropdownBlur">
             <div class="search-wrap">
@@ -247,7 +247,7 @@ export default {
         cursor: default;
 
         &, &::placeholder {
-            color: #000;
+            color: #999;
         }
 
         &.open {

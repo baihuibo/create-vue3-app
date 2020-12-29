@@ -1,23 +1,27 @@
 #### select 下拉框组件 文档
 
-基本使用----keycode 使用
+基本使用
+
+- `keycode` 使用
+
 ```vue
+
 <template>
     <form-item type="select" v-mode="value" :keycode="keycode"/>
 </template>
 
 <script>
-    export default {
-        setup(){
-            const value = ref("1");  //初始化选中数据
-            const keyCode = 'key';// 声明keycode参数
+export default {
+    setup() {
+        const value = ref("1");  //初始化选中数据
+        const keyCode = 'key';// 声明keycode参数
             return {value,keycode}
         }
     }
 </script>
 ```
-基本使用----list 使用
 
+- `list` 使用
 ```vue
 <template>
     <form-item type="select" v-model="value" :list="listData"/>
@@ -36,10 +40,10 @@
     }
 </script>
 ```
-基本使用----绑定onchange事件
 
-可通过 v-model:label='ref' 来获取选中项的label即 `valueName`
-可通过 v-model:current='ref' 来获取选中项的原始数据 即 `{valueCode,valueName}`
+- `change` 绑定change事件
+- `v-model:label='ref'` 来获取选中项的label即 `valueName`
+- `v-model:current='ref'` 来获取选中项的原始数据 即 `{valueCode,valueName}`
 ```vue
 <template>
     <form-item type="select"

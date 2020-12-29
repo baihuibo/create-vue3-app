@@ -17,7 +17,7 @@
 
 <script>
 import {nextTick, ref, watchEffect} from 'vue';
-import {clone, get, post} from "../../../../util";
+import {get, post} from "../../../../util";
 import {debounce} from "../../util";
 import {registerValidate} from "../../form-validator";
 
@@ -30,7 +30,7 @@ export default {
         searchContent: String,
         method: String,
         pageSize: Number,
-        params: {},
+        params: Object,
         beforeSend: Function,
         emptySearch: Boolean,
         placeholder: String,
@@ -153,7 +153,7 @@ export default {
         }
 
         async function query(params, pageIndex = 1) {
-            params = clone(params || {});
+            params = JSON.parse(JSON.stringify(params || {}));// clone
             params.pageSize = props.pageSize || 15;
             showNoResultRef.value = false;
             let getData;
@@ -220,7 +220,7 @@ ul, li {
     overflow: auto;
     position: absolute;
     left: 0;
-    top: 30px;
+    top: 100%;
     background: #fff;
     z-index: 9999;
     border: 1px solid #ccc;
