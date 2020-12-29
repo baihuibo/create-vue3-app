@@ -1,4 +1,4 @@
-### async-comp 异步加载组件
+### async-component 异步加载组件
 
 该组件已安装到全局
 
@@ -10,11 +10,11 @@
 
 <template>
     <div>
-        <async type="user-show"
-               :user-name="name" :user-id="id"/>
+        <async-component type="user-show"
+                         :user-name="name" :user-id="id"/>
 
-        <async type="paging"
-               @loadReady="pagingRef = $event"/>
+        <async-component type="paging"
+                         @loadReady="pagingRef = $event"/>
     </div>
 </template>
 
