@@ -3,7 +3,7 @@
            @keydown.e.prevent
            @keydown.E.prevent
            :value="formatFn(modelValue)"
-           @blur="change"
+           @blur="change" @input="change"
            class="form-control" step="any">
 </template>
 

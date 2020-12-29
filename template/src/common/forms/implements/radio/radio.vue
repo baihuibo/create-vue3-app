@@ -15,7 +15,7 @@ import {registerValidate} from "../../form-validator";
 
 export default {
     props: {
-        modelValue: String,
+        modelValue: [String, Number],
         label: String,
         keyCode: String,
         list: Array,

@@ -1,5 +1,5 @@
 <template>
-    <input type="text" :value="modelValue" ref="elementRef" @blur="change" class="form-control">
+    <input type="text" :value="modelValue" ref="elementRef" @input="change" @blur="change" class="form-control">
 </template>
 
 <script>

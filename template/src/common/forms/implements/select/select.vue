@@ -1,36 +1,39 @@
 <template>
-    <div class="multiple-select">
-        <input ref="elementRef" class="form-control" :class="dropdownShowRef ? 'open' : ''"
+    <div class="multiple-select" :class="{open : dropdownShowRef}">
+        <input ref="elementRef" class="form-control"
                type="text" :value="viewValue"
                :placeholder="noPlaceholder !== true ? placeholder : ''" :disabled="disabled"
                @keydown.prevent.stop @paste.prevent.stop @cut.prevent.stop @mousedown.prevent.stop
                @click="dropdownOpen">
-        <div ref="dropdownRef" class="dropdown" tabindex="-1" v-if="dropdownShowRef" @blur="dropdownBlur">
-            <div class="search-wrap">
-                <input type="text" ref="searchInputRef" class="form-control"
-                       placeholder="请搜索..." v-model="searchText"
-                       @focus="searchFocus" @blur="searchBlur">
-            </div>
-            <ul class="ul-list">
-                <li v-if="noPlaceholder !== true && !multiple" @click="toggleSelected()">{{ placeholder }}</li>
-                <li v-for="item in filter(searchText)"
-                    :class="{
+        <span class="arrow"></span>
+        <transition name="fade">
+            <div ref="dropdownRef" class="dropdown" tabindex="-1" v-if="dropdownShowRef" @blur="dropdownBlur">
+                <div class="search-wrap">
+                    <input type="text" ref="searchInputRef" class="form-control"
+                           placeholder="请搜索..." v-model="searchText"
+                           @focus="searchFocus" @blur="searchBlur">
+                </div>
+                <ul class="ul-list">
+                    <li v-if="noPlaceholder !== true && !multiple" @click="toggleSelected()">{{ placeholder }}</li>
+                    <li v-for="item in filter(searchText)"
+                        :class="{
                         active:!multiple && isSelect(item.valueCode),
                         'active-multiple' : multiple && isSelect(item.valueCode)
                     }"
-                    @click="toggleSelected(item)"
-                    layout="row" layout-align="start center">
-                    <input type="checkbox" tabindex="-1"
-                           v-if="multiple" :checked="isSelect(item.valueCode)">
-                    <div flex class="text">{{ item.valueName }}</div>
-                </li>
-            </ul>
-        </div>
+                        @click="toggleSelected(item)"
+                        layout="row" layout-align="start center">
+                        <input type="checkbox" tabindex="-1"
+                               v-if="multiple" :checked="isSelect(item.valueCode)">
+                        <div flex class="text">{{ item.valueName }}</div>
+                    </li>
+                </ul>
+            </div>
+        </transition>
     </div>
 </template>
 
 <script>
-import {nextTick, onMounted, ref, watchEffect} from "vue";
+import {nextTick, onMounted, onUpdated, ref} from "vue";
 import {getKeyCodes} from "../../util";
 import {registerValidate} from "../../form-validator";
 
@@ -77,7 +80,7 @@ export default {
             setViewValue()
         })
 
-        watchEffect(async () => {
+        onUpdated(async () => {
             let setVal = 0;
             if (Array.isArray(props.list) && props.list.length && listRef.value !== props.list) {
                 listRef.value = props.list;
@@ -247,11 +250,29 @@ export default {
         cursor: default;
 
         &, &::placeholder {
-            color: #999;
+            color: #000;
+        }
+    }
+
+    .arrow {
+        position: absolute;
+        right: 7px;
+        top: 40%;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #AFB3C2;
+        transition: transform .2s ease;
+    }
+
+    &.open {
+        .form-control {
+            border-radius: 2px 2px 0 0;
         }
 
-        &.open {
-            border-radius: 2px 2px 0 0;
+        .arrow {
+            transform: rotate(180deg);
         }
     }
 
@@ -264,6 +285,8 @@ export default {
         background-color: #fff;
         top: 100%;
         margin-top: -2px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, .25);
+        border-radius: 0 0 5px 5px;
 
         &:focus {
             outline: 0;
@@ -327,9 +350,14 @@ export default {
                     }
                 }
 
-                &:hover, &.active {
+                &:hover {
                     background-color: #e8e8e8;
                     border-color: #e8e8e8;
+                }
+
+                &.active {
+                    background-color: #3c6bff;
+                    color: #fff;
                 }
             }
         }

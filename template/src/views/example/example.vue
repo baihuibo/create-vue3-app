@@ -13,27 +13,33 @@
                 </form-interface>
                 <form-interface label="select：" flex="33">
                     <form-item type="select" v-model="dataRef.select" key-code="aaa" @change="change"
-                               no-search :validate-rule="{required:true}"/>
+                               :validate-rule="{required:true}"/>
                 </form-interface>
                 <form-interface label="select lazeload：" flex="33">
-                    <form-item type="select" v-model="dataRef.select2" key-code="aaa" lazeload @change="change"
-                               :validate-rule="{required:true}"/>
+                    <form-item type="select" v-model="dataRef.select2" key-code="aaa"
+                               lazeload @change="change"/>
                 </form-interface>
                 <form-interface label="checkbox：" flex="33">
-                    <form-item type="checkbox" v-model="dataRef.checkbox" key-code="323232" @change="change"
-                               :validate-rule="{required:true}"/>
+                    <form-item type="checkbox" v-model="dataRef.checkbox" key-code="323232" @change="change"/>
                 </form-interface>
                 <form-interface label="radio：" flex="33">
-                    <form-item type="radio" v-model="dataRef.radio" key-code="323232" @change="change"
-                               :validate-rule="{required:true}"/>
+                    <form-item type="radio" v-model="dataRef.radio" key-code="323232" @change="change"/>
                 </form-interface>
                 <form-interface label="date：" flex="33">
-                    <form-item type="date" v-model="dataRef.date" @change="change"
-                               :validate-rule="{required:true}"/>
+                    <form-item type="date" v-model="dataRef.date" @change="change"/>
                 </form-interface>
                 <form-interface label="date-range：" flex="33">
                     <form-item type="date-range" v-model:start="dataRef.start" v-model:end="dataRef.end"
                                @change="change" :validate-rule="{required:true}"/>
+                </form-interface>
+                <form-interface label="switch：" flex="33">
+                    <form-item type="switch" v-model="dataRef.switch"/>
+                </form-interface>
+                <form-interface label="time：" flex="33">
+                    <form-item type="time" v-model="dataRef.time"/>
+                </form-interface>
+                <form-interface label="time：" flex="33">
+                    <form-item type="time" v-model="dataRef.time2" format="HH:mm:ss"/>
                 </form-interface>
                 <form-interface label="live-search：" flex="33">
                     <form-item type="live-search" @change="change" search-content="searchContent"
@@ -50,7 +56,21 @@
                 <button class="btn ml-10" @click="changeParam" type="button"> 变更参数</button>
             </div>
         </form>
-        <pre>{{ dataRef }}</pre>
+        <div layout="row">
+            <pre flex>{{ dataRef }}</pre>
+
+            <div flex>
+                <form-interface label="搜索">
+                    <form-item type="text" v-model="searchText"/>
+                </form-interface>
+                <form-interface>
+                    <async-component type="tree"
+                                     :nodes="nodes"
+                                     :search-text="searchText"
+                                     checkable/>
+                </form-interface>
+            </div>
+        </div>
     </div>
     <div class="box mt-20">
         <h2 class="chapter-header">表格展示</h2>
@@ -98,6 +118,8 @@
                          url="/bdc/layout/queryList.htm"
                          @load="pagingRef = $event"/>
     </div>
+
+
 </template>
 
 <script>
@@ -130,7 +152,6 @@ export default {
         ]
 
         function change() {
-
         }
 
         // 触发查询
@@ -151,20 +172,42 @@ export default {
             dataRef.name = "白慧波";
         }
 
-        function responseHandler() {
-
+        function responseHandler(result) {
+            result.data.rows = result.data.rows.map(item => {
+                return {
+                    valueCode: item.optionValue,
+                    valueName: item.optionText,
+                }
+            })
+            return result;
         }
 
         function beforeSend(param) {
             return param; //将改变后的请求参数return  --注意:格式不能发生变化
         }
 
+        const nodes = ref([{
+            name: '北京公司',
+            children: [
+                {name: '朝青大区'},
+                {
+                    name: 'CBD全能组',
+                    children: [
+                        {name: '双井全能店'},
+                        {name: '全能1店'}
+                    ]
+                },
+                {name: 'leaf2'}
+            ]
+        }])
+        const searchText = ref('');
+
         return {
             list, dataRef, pagingRef, form,
             change, doQuery,
             changeParam,
             responseHandler,
-            beforeSend
+            beforeSend, nodes, searchText
         }
     }
 }

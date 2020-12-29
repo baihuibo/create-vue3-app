@@ -10,26 +10,28 @@
             <span class="arrow-down" @click="calcTime(0)"></span>
         </div>
 
-        <div v-if="showContentRef" class="content-view" layout="row">
-            <div flex class="list" v-if="listState.HH">
-                <div class="item" :class="{active:item === dateState.hh}"
-                     :ref="el => scrollIntoView(el,item === dateState.hh)"
-                     @click="change(item)" v-for="item in HH">{{ item }}
+        <transition name="fade">
+            <div v-if="showContentRef" class="content-view" layout="row">
+                <div flex class="list" v-if="listState.HH">
+                    <div class="item" :class="{active:item === dateState.hh}"
+                         :ref="el => scrollIntoView(el,item === dateState.hh)"
+                         @click="change(item)" v-for="item in HH">{{ item }}
+                    </div>
+                </div>
+                <div flex class="list" v-if="listState.mm">
+                    <div class="item" :class="{active:item === dateState.mm}"
+                         :ref="el => scrollIntoView(el,item === dateState.mm)"
+                         @click="change(null,item)" v-for="item in MM">{{ item }}
+                    </div>
+                </div>
+                <div flex class="list" v-if="listState.ss">
+                    <div class="item" :class="{active:item === dateState.ss}"
+                         :ref="el => scrollIntoView(el,item === dateState.ss)"
+                         @click="change(null,null,item)" v-for="item in SS">{{ item }}
+                    </div>
                 </div>
             </div>
-            <div flex class="list" v-if="listState.mm">
-                <div class="item" :class="{active:item === dateState.mm}"
-                     :ref="el => scrollIntoView(el,item === dateState.mm)"
-                     @click="change(null,item)" v-for="item in MM">{{ item }}
-                </div>
-            </div>
-            <div flex class="list" v-if="listState.ss">
-                <div class="item" :class="{active:item === dateState.ss}"
-                     :ref="el => scrollIntoView(el,item === dateState.ss)"
-                     @click="change(null,null,item)" v-for="item in SS">{{ item }}
-                </div>
-            </div>
-        </div>
+        </transition>
     </div>
 </template>
 
@@ -98,6 +100,9 @@ export default {
                         warn('time 组件，输入时间不合法，以将它设置为空', props.modelValue)
                         dateState.hh = dateState.mm = dateState.ss = '';
                     }
+                    change();
+                } else if (props.modelValue === null) {
+                    dateState.hh = dateState.mm = dateState.ss = '';
                     change();
                 }
             })
@@ -286,9 +291,11 @@ function getDateValue(oldValue, value) {
     border: 1px solid #ccc;
     border-top: 0;
     box-sizing: border-box;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .25);
+    border-radius: 0 0 5px 5px;
 
     .list {
-        max-height: 150px;
+        max-height: 200px;
         overflow: auto;
         text-align: center;
 
@@ -297,8 +304,9 @@ function getDateValue(oldValue, value) {
         }
 
         .item {
-            height: 20px;
-            line-height: 20px;
+            height: 32px;
+            line-height: 32px;
+            font-size: 14px;
             cursor: pointer;
 
             &:hover {

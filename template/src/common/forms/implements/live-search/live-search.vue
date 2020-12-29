@@ -3,21 +3,23 @@
         <input type="search" :disabled="disabled" :readonly="disabled" @input="inputChange" :value="valueRef"
                @keydown.enter.prevent
                @focus="focus" @blur="inutBlur" class="form-control" :placeholder="placeholder" ref="elementRef">
-        <ul class="content-view no-result" v-if="showNoResultRef">
-            <li>没有搜索到结果</li>
-        </ul>
-        <ul class="content-view" v-if="showContentRef && listRef.length" ref="viewRef" @scroll="handleScroll">
-            <li v-for="item in listRef"
-                :class="{active:valueRef === item.valueName}"
-                @click="chooseItem(item)">{{ item.valueName }}
-            </li>
-        </ul>
+        <transition-group name="fade">
+            <ul class="content-view no-result" v-if="showNoResultRef">
+                <li>没有搜索到结果</li>
+            </ul>
+            <ul class="content-view" v-if="showContentRef && listRef.length" ref="viewRef" @scroll="handleScroll">
+                <li v-for="item in listRef"
+                    :class="{active:valueRef === item.valueName}"
+                    @click="chooseItem(item)">{{ item.valueName }}
+                </li>
+            </ul>
+        </transition-group>
     </div>
 </template>
 
 <script>
 import {nextTick, ref, watchEffect} from 'vue';
-import {get, post} from "../../../../util";
+import {clone, get, post} from "../../../../util";
 import {debounce} from "../../util";
 import {registerValidate} from "../../form-validator";
 
@@ -153,7 +155,7 @@ export default {
         }
 
         async function query(params, pageIndex = 1) {
-            params = JSON.parse(JSON.stringify(params || {}));// clone
+            params = clone(params || {});// clone
             params.pageSize = props.pageSize || 15;
             showNoResultRef.value = false;
             let getData;
@@ -221,10 +223,13 @@ ul, li {
     position: absolute;
     left: 0;
     top: 100%;
+    margin-top: -1px;
     background: #fff;
     z-index: 9999;
     border: 1px solid #ccc;
     box-sizing: border-box;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .25);
+    border-radius: 0 0 5px 5px;
 
     &.no-result {
         pointer-events: none;
@@ -237,14 +242,13 @@ ul, li {
         text-indent: 10px;
         cursor: pointer;
 
-        &.active {
-            color: #fff;
-            background: rgb(53, 95, 214);
+        &:hover {
+            background: #e8e8e8;
         }
 
-        &:hover {
-            background: rgba(52, 73, 130, .8);
+        &.active {
             color: #fff;
+            background: #3c6bff;
         }
     }
 }

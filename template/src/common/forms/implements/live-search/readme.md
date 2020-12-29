@@ -1,7 +1,7 @@
 #### live-search 搜索框框组件 文档
 
-基本使用
 
+基本使用
 - `url` 接口路径
 - `searchContent` 模糊查询接口所需的查询参数
 
@@ -52,9 +52,7 @@
     }
 </script>
 ```
-
 基本使用
-
 - `params` 接口所需的额外参数
 
 ```vue
@@ -83,7 +81,6 @@
 ```
 
 基本使用
-
 - `page-size` 每次返回的条数限制 ，默认15
 
 ```vue
@@ -136,12 +133,14 @@
 </script>
 ```
 
-基本使用
 
+
+基本使用
 - `before-send` 发送请求前的处理，返回请求的参数，以json格式返回
 - `change` 绑定change事件
 
 ```vue
+
 <template>
     <form-item type="live-search"
                :before-send="beforeSend"
@@ -154,11 +153,11 @@
 </template>
 
 <script>
-    export default {
-        setup(){
-            const dataRef = reactive({
-                id:"123",
-                name:"abc"
+export default {
+    setup() {
+        const dataRef = reactive({
+            id: "123",
+            name: "abc"
             });
 
 
@@ -176,11 +175,9 @@
 ```
 
 基本使用
-
 - `responseHandler` 处理请求回来的数据
 
 如果后台接口返回的数据不是如下格式的数据,需要通过`responseHandler`函数进行转换
-
 ```
 {
     code:0,
@@ -194,6 +191,7 @@
 ```
 
 ```vue
+
 <template>
     <form-item type="live-search"
                :response-handler="responseHandler"
@@ -206,7 +204,7 @@
 </template>
 
 <script>
-    export default {
+export default {
         setup(){
             const dataRef = reactive({
                 id:"123",

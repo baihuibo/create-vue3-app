@@ -37,7 +37,7 @@ export default {
 </script>
 <style scoped lang="less">
 .switch-btn {
-    @size: 24px;
+    @size: 22px;
     @selectSize: @size + 2px;
     position: relative;
     background: none;
@@ -50,7 +50,7 @@ export default {
         user-select: none;
         display: inline-block;
         position: relative;
-        min-width: 40px;
+        min-width: 45px;
         height: @size;
         line-height: @size;
         border-radius: 100px;

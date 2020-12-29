@@ -24,8 +24,8 @@ export default {
 </script>
 ```
 
-- `config` 配置，限制日期选择范围
 
+- `config` 配置，限制日期选择范围
 ```
 config = {
     min // 可选择日期的最小范围
