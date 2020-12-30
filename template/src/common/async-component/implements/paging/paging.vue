@@ -96,8 +96,18 @@ export default {
             }
 
             modal.showLoading();
-            let result = await Promise.resolve(getData(params));
-            modal.hideLoading();
+            let result;
+            try {
+                result = await Promise.resolve(getData(params));
+                if (+result.code !== 0 && result.msg) {
+                    throw result.msg;
+                }
+            } catch (e) {
+                modal.alert(e.message || e);
+                return;
+            } finally {
+                modal.hideLoading();
+            }
 
             if (typeof props.responseHandler === 'function') {
                 result = props.responseHandler(result) || result;
