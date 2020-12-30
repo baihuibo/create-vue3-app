@@ -6,7 +6,7 @@
                @keydown.prevent.stop @paste.prevent.stop @cut.prevent.stop @mousedown.prevent.stop
                @click="dropdownOpen">
         <span class="arrow"></span>
-        <transition name="fade">
+        <transition name="slide-down">
             <div ref="dropdownRef" class="dropdown" tabindex="-1" v-if="dropdownShowRef" @blur="dropdownBlur">
                 <div class="search-wrap">
                     <input type="text" ref="searchInputRef" class="form-control"

@@ -82,13 +82,36 @@ input[type=number].form-control {
     }
 }
 
-.fade-enter-active,
-.fade-leave-active {
-    transition: all .25s ease;
+.slide-down-enter-active {
+    transform-origin: 100% top;
+    animation: slideDownIn 0.2s;
 }
 
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-    transform: translateY(-5px);
+.slide-down-leave-active {
+    transform-origin: 100% top;
+    animation: slideDownOut 0.15s;
+}
+
+@keyframes slideDownIn {
+    0% {
+        transform: scaleY(.8);
+        opacity: 0
+    }
+
+    to {
+        transform: scaleY(1);
+        opacity: 1
+    }
+}
+
+@keyframes slideDownOut {
+    0% {
+        transform: scaleY(1);
+        opacity: 1
+    }
+
+    to {
+        transform: scaleY(.8);
+        opacity: 0
+    }
 }

@@ -10,7 +10,7 @@
             <span class="arrow-down" @click="calcTime(0)"></span>
         </div>
 
-        <transition name="fade">
+        <transition name="slide-down">
             <div v-if="showContentRef" class="content-view" layout="row">
                 <div flex class="list" v-if="listState.HH">
                     <div class="item" :class="{active:item === dateState.hh}"

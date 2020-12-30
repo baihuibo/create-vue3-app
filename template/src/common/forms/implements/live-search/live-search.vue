@@ -3,7 +3,7 @@
         <input type="search" :disabled="disabled" :readonly="disabled" @input="inputChange" :value="valueRef"
                @keydown.enter.prevent
                @focus="focus" @blur="inutBlur" class="form-control" :placeholder="placeholder" ref="elementRef">
-        <transition-group name="fade">
+        <transition-group name="slide-down">
             <ul class="content-view no-result" v-if="showNoResultRef">
                 <li>没有搜索到结果</li>
             </ul>
