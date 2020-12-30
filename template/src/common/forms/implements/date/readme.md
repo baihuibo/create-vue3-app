@@ -4,7 +4,7 @@
 
 ```vue
 <template>
-    <form-item type="date" v-mode="value"/>
+    <form-item type="date" v-model="value"/>
 </template>
 
 <script>
@@ -29,24 +29,22 @@ config = {
 - `change` 绑定change事件
 
 ```vue
-
 <template>
-    <form-item type="date" v-mode="value"
+    <form-item type="date" v-model="value"
                :config="{min:'2020-1-2',max:'2020-10-23'}"
                @change="change"/>
 </template>
 
 <script>
-export default {
-    setup() {
-        const value = ref("2020-2-2") //初始化日期 -- 必须是日期格式 YYYY-mm-dd || YYYY-MM-DD
+    export default {
+        setup(){
+            const value = ref("2020-2-2") //初始化日期 -- 必须是日期格式 YYYY-mm-dd || YYYY-MM-DD
 
-        function change(date) {
-            console.log(date) //可以获取发生改变的值
+            function change(date){
+                console.log(date) //可以获取发生改变的值
+            }
+            return {value,change}
         }
-
-        return {value, change}
     }
-}
 </script>
 ```

@@ -4,7 +4,7 @@
 - `to-fixed` 保留几位小数
 ```vue
 <template>
-    <form-item type="number" v-mode="value" :to-fixed="2"/>
+    <form-item type="number" v-model="value" :to-fixed="2"/>
 </template>
 
 <script>

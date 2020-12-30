@@ -5,7 +5,7 @@
 ```vue
 
 <template>
-    <form-item type="switch" v-mode="value"/>
+    <form-item type="switch" v-model="value"/>
 </template>
 
 <script>
@@ -23,7 +23,7 @@ export default {
 ```vue
 
 <template>
-    <form-item type="switch" v-mode="value">
+    <form-item type="switch" v-model="value">
         <template #default="{checked}">
             {{checked ? '是' : '否'}}
         </template>

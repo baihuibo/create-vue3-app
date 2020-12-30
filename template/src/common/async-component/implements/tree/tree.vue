@@ -13,7 +13,7 @@
 <script>
 import treeNode from './tree-node.vue';
 import {onUpdated, ref, watchEffect} from "vue";
-import {throttle} from "../../../../util";
+import {debounce} from "../../../../util";
 import {getUuid} from "../../../forms/util";
 
 export default {
@@ -117,22 +117,21 @@ export default {
 
         // 搜索器
         let preSearchText = '';
-        onUpdated(() => {
-            if (props.searchText) {
-                if (props.searchText !== preSearchText) {
-                    preSearchText = props.searchText;
-                    doSearchNode(props.searchText);
+        onUpdated(debounce(() => {
+            const {searchText} = props
+            if (searchText) {
+                if (searchText !== preSearchText) {
+                    preSearchText = searchText;
+
+                    // 搜索节点
+                    searchNodes.value = getNodesBySearchText(rootNodes.value, 'name', searchText);
                 }
-            } else if (preSearchText) {// 清楚搜索痕迹
+            } else if (preSearchText) {// 清除搜索痕迹
                 preSearchText = '';
                 eachNodes(searchNodes.value, node => delete node.search)
                 searchNodes.value = null;
             }
-        });
-
-        const doSearchNode = function (searchText) {
-            searchNodes.value = getNodesBySearchText(rootNodes.value, 'name', searchText);
-        };
+        }, 300));
 
         // 获取全部选中的节点
         const getAllSelectedNodes = function (all) {
@@ -150,6 +149,7 @@ export default {
     }
 }
 
+// 根据属性值获取节点列表，如查询所有选中节点
 function getNodeByState(nodes, key, value, hasEach) {
     let results = [];
     if (hasEach) {
@@ -163,7 +163,7 @@ function getNodeByState(nodes, key, value, hasEach) {
             if (node[key] === value) {
                 results.push(node);
             } else if (hasChildren(node)) {
-                results = results.concat(getNodeByState(node.children, key, value, hasEach));
+                results = results.concat(getNodeByState(node.children, key, value));
             }
         }
     }
@@ -235,6 +235,7 @@ function simpleDataConvert(list, option) {
     const {parentId, idKey, pidKey} = option;
 
     const nodes = list.filter(item => item[pidKey] === parentId);
+    const id = 'id';
 
     if (nodes.length) {
         for (const child of nodes) {
@@ -243,8 +244,8 @@ function simpleDataConvert(list, option) {
             if (children) {
                 child.children = children;
             }
-            if (idKey !== 'id') {
-                child['id'] = child[idKey];
+            if (idKey !== id) {
+                child[id] = child[idKey];
             }
         }
         return nodes;
@@ -258,7 +259,9 @@ function setChildrenCheckedByDeep(node, checked) {
     }
 
     if (hasChildren(node)) { // 影响所有孩子
-        eachNodes(node.children, child => setChildrenCheckedByDeep(child, checked))
+        for (const child of node.children) {
+            setChildrenCheckedByDeep(child, checked)
+        }
     }
 }
 

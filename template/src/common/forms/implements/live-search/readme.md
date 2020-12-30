@@ -140,7 +140,6 @@
 - `change` 绑定change事件
 
 ```vue
-
 <template>
     <form-item type="live-search"
                :before-send="beforeSend"
@@ -153,11 +152,11 @@
 </template>
 
 <script>
-export default {
-    setup() {
-        const dataRef = reactive({
-            id: "123",
-            name: "abc"
+    export default {
+        setup(){
+            const dataRef = reactive({
+                id:"123",
+                name:"abc"
             });
 
 
@@ -191,7 +190,6 @@ export default {
 ```
 
 ```vue
-
 <template>
     <form-item type="live-search"
                :response-handler="responseHandler"
@@ -204,7 +202,7 @@ export default {
 </template>
 
 <script>
-export default {
+    export default {
         setup(){
             const dataRef = reactive({
                 id:"123",

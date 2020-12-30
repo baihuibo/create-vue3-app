@@ -1,10 +1,11 @@
 #### radio 单选框组件 文档
 
+
 基本使用
 - `keycode` 使用
 ```vue
 <template>
-    <form-item type="radio" v-mode="value" :keycode="keycode"/>
+    <form-item type="radio" v-model="value" :keycode="keycode"/>
 </template>
 
 <script>
@@ -39,7 +40,7 @@
 - 绑定`change`事件
 ```vue
 <template>
-    <form-item type="radio" v-mode="value" :keycode="keycode" @change="change"/>
+    <form-item type="radio" v-model="value" :keycode="keycode" @change="change"/>
 </template>
 
 <script>

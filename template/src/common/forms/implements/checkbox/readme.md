@@ -5,7 +5,7 @@
 
 ```vue
 <template>
-    <form-item type="checkbox" v-mode="value" :keycode="keycode"/>
+    <form-item type="checkbox" v-model="value" :keycode="keycode"/>
 </template>
 
 <script>
@@ -42,7 +42,7 @@
 
 ```vue
 <template>
-    <form-item type="checkbox" v-mode="value" :keycode="keycode" @change="change"/>
+    <form-item type="checkbox" v-model="value" :keycode="keycode" @change="change"/>
 </template>
 
 <script>

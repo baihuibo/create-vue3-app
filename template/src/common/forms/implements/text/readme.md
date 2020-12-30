@@ -5,7 +5,7 @@
 ```vue
 
 <template>
-    <form-item type="text" v-mode="value"/>
+    <form-item type="text" v-model="value"/>
 </template>
 
 <script>

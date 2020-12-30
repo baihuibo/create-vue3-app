@@ -5,7 +5,7 @@
 - `keycode` 使用
 ```vue
 <template>
-    <form-item type="select" v-mode="value" :keycode="keycode"/>
+    <form-item type="select" v-model="value" :keycode="keycode"/>
 </template>
 
 <script>
