@@ -16,12 +16,69 @@
 export default {
     setup() {
         const treeRef = ref();
-        const nodes = [];
+        const nodes = ref([
+            {
+                name: '111',
+                children: [
+                    {name: '222'},
+                    {name: '333'},
+                ]
+            }
+        ]);
 
         return {treeRef, nodes}
     }
 }
 </script>
+```
+
+- 简单数据模式
+
+```vue
+
+<template>
+    <async-component type="tree"
+                     :nodes="nodes"
+                     simple-data :root-id="0"
+                     @load="treeRef = $event"/>
+</template>
+
+<script>
+export default {
+    setup() {
+        const treeRef = ref();
+        // 通过id、pid进行关联的简单数据
+        const nodes = ref([
+            {name: '111', id: 1, pid: 0},
+            {name: '222', id: 2, pid: 1},
+            {name: '333', id: 3, pid: 2},
+            {name: '444', id: 4, pid: 2},
+        ]);
+
+        return {treeRef, nodes}
+    }
+}
+</script>
+```
+
+- 简单数据格式转换，当源数据格式为非标准简单数据时，进行对应的转换
+
+```js
+
+var sourceData = [
+    {deptName: '111', deptId: 1, deptParentId: 0},
+    {deptName: '222', deptId: 2, deptParentId: 1},
+    {deptName: '333', deptId: 3, deptParentId: 2},
+    {deptName: '444', deptId: 4, deptParentId: 2},
+]
+
+// 将数据格式进行转换为 id、name、pid 标准简单数据格式
+var newData = sourceData.map(({deptName: name, deptId: id, deptParentId: pid}) => {
+    return {name, id, pid}
+})
+
+const nodes = ref(newData);
+
 ```
 
 插槽模板渲染，可定制节点展示模板或者定制按钮等
@@ -171,21 +228,21 @@ tree.selected    // 获取当前选中的节点（仅单选的时候）
 ```html
 
 <async-component
-        type="tree"
-        selected-multi
-        checkable
-        simple-data
-        id-key="id" pid-key="pid"
-        :nodes="nodes"
-        :root-id="null"
-        :load-data="loadDataFn"
-        :search-text="searchTextRef"
-        :expanded-level="2"
-        @load="treeRef = $event"
-        @before-select="beforeSelectFn"
-        @select="selectFn"
-        @before-check="beforeCheckFn"
-        @check="checkFn"/>
+    type="tree"
+    selected-multi
+    checkable
+    simple-data
+    id-key="id" pid-key="pid"
+    :nodes="nodes"
+    :root-id="null"
+    :load-data="loadDataFn"
+    :search-text="searchTextRef"
+    :expanded-level="2"
+    @load="treeRef = $event"
+    @before-select="beforeSelectFn"
+    @select="selectFn"
+    @before-check="beforeCheckFn"
+    @check="checkFn"/>
 ```
 
 <table>
@@ -219,20 +276,6 @@ tree.selected    // 获取当前选中的节点（仅单选的时候）
             <td>false</td>
             <td>否</td>
             <td>简单数据</td>
-        </tr>
-        <tr>
-            <td>id-key</td>
-            <td>String</td>
-            <td>id</td>
-            <td>否</td>
-            <td>简单数据模式时的id标记</td>
-        </tr>
-        <tr>
-            <td>pid-key</td>
-            <td>String</td>
-            <td>pid</td>
-            <td>否</td>
-            <td>简单数据模式时的pid标记</td>
         </tr>
         <tr>
             <td>nodes</td>

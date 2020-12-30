@@ -21,16 +21,14 @@ export default {
     props: {
         selectedMulti: Boolean, // 是否支持选中多个节点
         nodes: Array, // 数据
-        rootId: [Number, String], // 根节点id
-        idKey: String, // id
-        pidKey: String, // pid
+        simpleData: Boolean, // 是否为 name、id、pid 的简单数据
+        rootId: [Number, String], // 简单数据时，根节点id
         loadData: Function, // 异步加载数据
         searchText: String, // 搜索过滤
         beforeCheck: Function,
         beforeSelect: Function,
         checkable: Boolean, // 是否显示多选框，默认不显示
         expandedLevel: Number, // 初始化时展开几级节点，默认0，若设置-1则全部展开
-        simpleData: Boolean // 是否为 id、pid 的简单数据
     },
     setup(props, {emit}) {
         const util = {
@@ -73,7 +71,7 @@ export default {
                     selected.value = node.selected ? node : void 0;
                 }
 
-                emit('select', selected);
+                emit('select', node);
             }
         };
 
@@ -93,11 +91,7 @@ export default {
             cacheNodes = props.nodes; // 缓存nodes
             if (Array.isArray(props.nodes) && props.nodes.length) {
                 if (props.simpleData) {
-                    rootNodes.value = simpleDataConvert(cacheNodes, {
-                        parentId: props.rootId,
-                        idKey: props.idKey || 'id',
-                        pidKey: props.pidKey || 'pid',
-                    });
+                    rootNodes.value = simpleDataConvert(cacheNodes, props.rootId);
                 } else {
                     rootNodes.value = cacheNodes;
                 }
@@ -124,7 +118,7 @@ export default {
                     preSearchText = searchText;
 
                     // 搜索节点
-                    searchNodes.value = getNodesBySearchText(rootNodes.value, 'name', searchText);
+                    searchNodes.value = getNodesBySearchText(rootNodes.value, searchText);
                 }
             } else if (preSearchText) {// 清除搜索痕迹
                 preSearchText = '';
@@ -171,27 +165,27 @@ function getNodeByState(nodes, key, value, hasEach) {
 }
 
 // 模糊搜索节点
-function getNodesBySearchText(nodes, key, searchText) {
+function getNodesBySearchText(nodes, searchText) {
     if (!nodes || !searchText) return [];
 
     const searchTextLower = searchText.toLowerCase();
     let result = [];
 
     for (const node of nodes) {
-        const value = node[key];
-        if (value) {
-            const findIndex = value.toLowerCase().indexOf(searchTextLower);
+        const {name = ''} = node;
+        if (name) {
+            const findIndex = name.toLowerCase().indexOf(searchTextLower);
             if (findIndex > -1) {
                 node.search = {
-                    beforeStr: value.slice(0, findIndex),
-                    after: value.slice(findIndex + searchText.length),
+                    beforeStr: name.slice(0, findIndex),
+                    after: name.slice(findIndex + searchText.length),
                     searchText
                 };
                 result.push(node);
             }
         }
         if (hasChildren(node)) {
-            result = result.concat(getNodesBySearchText(node.children, key, searchText));
+            result = result.concat(getNodesBySearchText(node.children, searchText));
         }
     }
     return result;
@@ -200,7 +194,7 @@ function getNodesBySearchText(nodes, key, searchText) {
 // 自动展开选中的节点
 function autoOpenCheckedNode(nodes) {
     eachNodes(nodes, node => {
-        node.checked && setParentExpandByDeep(node, true);
+        (node.checked || node.selected) && setParentExpandByDeep(node, true);
     })
 }
 
@@ -231,25 +225,17 @@ function expandedLevelByNodes(nodes, level, util) {
     }
 }
 
-function simpleDataConvert(list, option) {
-    const {parentId, idKey, pidKey} = option;
-
-    const nodes = list.filter(item => item[pidKey] === parentId);
-    const id = 'id';
-
+function simpleDataConvert(list, pid) {
+    const nodes = list.filter(item => item.pid === pid);
     if (nodes.length) {
-        for (const child of nodes) {
-            option.parentId = child[idKey];
-            const children = simpleDataConvert(list, option);
-            if (children) {
-                child.children = children;
-            }
-            if (idKey !== id) {
-                child[id] = child[idKey];
+        for (const node of nodes) {
+            const children = simpleDataConvert(list, node.id);
+            if (children.length) {
+                node.children = children;
             }
         }
-        return nodes;
     }
+    return nodes;
 }
 
 // 递归设置孩子的选中状态
@@ -270,7 +256,7 @@ function setParentExpandByDeep(node, expand) {
     const {parentNode} = node;
     if (parentNode) {
         parentNode.expanded = expand;
-        setParentExpandByDeep(parentNode);
+        setParentExpandByDeep(parentNode, expand);
     }
 }
 
