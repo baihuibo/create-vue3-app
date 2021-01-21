@@ -12,7 +12,11 @@
         <span v-if="checkable && node.checkable !== false"
               @click.stop="util.toggleChecked(node, !node.checked)"
               class="tree-icon tree-icon-checkbox"
-              :class="{checked:node.checked,disabled:node.disabled}"></span>
+              :class="{
+                  checked:node.checked,
+                  disabled:node.disabled,
+                  indeterminate:node.indeterminate
+              }"></span>
 
         <div flex class="tree-leaf-content">
             <slot v-if="$slots.default" v-bind="$props"/>
@@ -79,6 +83,10 @@ export default {
     .tree-leaf-content {
         padding: 5px 0;
     }
+
+    > * {
+        flex-shrink: 0;
+    }
 }
 
 .tree-icon {
@@ -112,6 +120,22 @@ export default {
         opacity: 0;
         transition: all .05s cubic-bezier(.71, -.46, .88, .6), opacity .05s;
         content: " ";
+    }
+
+    &.indeterminate {
+        background-color: #fff;
+        border-color: #d9d9d9;
+
+        &::after {
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background-color: #1890ff;
+            border: 0;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
     }
 
     &.checked {

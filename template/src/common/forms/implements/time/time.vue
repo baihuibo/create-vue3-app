@@ -97,7 +97,7 @@ export default {
                         dateState.mm = timePad(Math.min(+exec.groups.mm, 59));
                         dateState.ss = timePad(Math.min(+exec.groups.ss, 59));
                     } else {
-                        warn('time 组件，输入时间不合法，以将它设置为空', props.modelValue)
+                        warn('[time] 输入时间不合法，已将它设置为空', props.modelValue)
                         dateState.hh = dateState.mm = dateState.ss = '';
                     }
                     change();
@@ -150,6 +150,8 @@ export default {
                 hh = +dateState.hh || 0,
                 mm = +dateState.mm || 0,
                 ss = +dateState.ss || 0;
+
+            elementRef.value.focus();
 
             const date = new Date();
             date.setHours(hh, mm, ss);

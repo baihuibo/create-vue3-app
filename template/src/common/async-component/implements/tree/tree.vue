@@ -1,5 +1,5 @@
 <template>
-    <div class="tree-root">
+    <div className="tree-root">
         <template v-for="node in searchNodes || rootNodes" :key="node.id">
             <tree-node :node="node" :util="util" :level="0" :checkable="checkable">
                 <template v-for="(_,name) in $slots" v-slot:[name]="slotBinds">
@@ -22,11 +22,11 @@ export default {
         selectedMulti: Boolean, // 是否支持选中多个节点
         nodes: Array, // 数据
         simpleData: Boolean, // 是否为 name、id、pid 的简单数据
-        rootId: [Number, String], // 简单数据时，根节点id
         loadData: Function, // 异步加载数据
         searchText: String, // 搜索过滤
         beforeCheck: Function,
         beforeSelect: Function,
+        autoCheck: {type: Boolean, default: true}, // 自动选中孩子和父亲，默认true
         checkable: Boolean, // 是否显示多选框，默认不显示
         expandedLevel: Number, // 初始化时展开几级节点，默认0，若设置-1则全部展开
     },
@@ -51,8 +51,12 @@ export default {
                             return;
                         }
                     }
-                    setChildrenCheckedByDeep(node, checked);
-                    setParentCheckedByDeep(node);
+                    if (props.autoCheck) {
+                        setChildrenCheckedByDeep(node, checked);
+                        setParentCheckedByDeep(node);
+                    } else if (!node.disabled) {
+                        node.checked = checked;
+                    }
                     emit('check', node);
                 }
             },
@@ -91,12 +95,21 @@ export default {
             cacheNodes = props.nodes; // 缓存nodes
             if (Array.isArray(props.nodes) && props.nodes.length) {
                 if (props.simpleData) {
-                    rootNodes.value = simpleDataConvert(cacheNodes, props.rootId);
+                    rootNodes.value = toTree(cacheNodes);
                 } else {
                     rootNodes.value = cacheNodes;
                 }
             } else {
                 rootNodes.value = [];
+            }
+
+            if (!props.selectedMulti) {
+                for (const node of cacheNodes) {
+                    if (node.selected) {
+                        selected.value = node;
+                        break;
+                    }
+                }
             }
 
             setParentNodeAndIds(rootNodes.value);
@@ -225,23 +238,32 @@ function expandedLevelByNodes(nodes, level, util) {
     }
 }
 
-function simpleDataConvert(list, pid) {
-    const nodes = list.filter(item => item.pid === pid);
-    if (nodes.length) {
-        for (const node of nodes) {
-            const children = simpleDataConvert(list, node.id);
-            if (children.length) {
-                node.children = children;
-            }
-        }
+function toTree(data) {
+    const result = []
+    if (!Array.isArray(data)) {
+        return result
     }
-    return nodes;
+    const map = {};
+    data.forEach(item => {
+        delete item.children;
+        map[item.id] = item;
+    });
+    data.forEach(item => {
+        let parent = map[item.pid];
+        if (parent) {
+            (parent.children || (parent.children = [])).push(item);
+        } else {
+            result.push(item);
+        }
+    });
+    return result;
 }
 
 // 递归设置孩子的选中状态
 function setChildrenCheckedByDeep(node, checked) {
     if (!node.disabled) {
         node.checked = checked;
+        delete node.indeterminate
     }
 
     if (hasChildren(node)) { // 影响所有孩子
@@ -262,10 +284,14 @@ function setParentExpandByDeep(node, expand) {
 
 // 递归设置父元素选中状态
 function setParentCheckedByDeep(node) {
+    delete node.indeterminate;
     const {parentNode} = node;
     if (parentNode) {
-        if (!parentNode.disabled) {
+        if (parentNode.checkable !== false && !parentNode.disabled) {
             parentNode.checked = hasChildrenChecked(parentNode.children || []);
+            if (!parentNode.checked) {
+                parentNode.indeterminate = hasChildrenIndeterminate(parentNode.children);
+            }
         }
         setParentCheckedByDeep(parentNode);
     }
@@ -285,6 +311,15 @@ function hasChildrenChecked(nodes) {
         }
         return node.checked;
     })
+}
+
+// 是否有任意孩子呗选中
+function hasChildrenIndeterminate(nodes) {
+    for (const node of nodes) {
+        if (node.checked) {
+            return true;
+        }
+    }
 }
 
 // 递归节点

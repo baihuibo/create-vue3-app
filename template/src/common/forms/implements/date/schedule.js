@@ -71,7 +71,8 @@ export default function Schedule(opt) {
         currentDay = curDate.getDate(),
         activeDate = '',
         el = document.querySelector(opt.el) || document.querySelector('body'),
-        _this = this;
+        _this = this,
+        editInput;
     var bindEvent = function () {
         el.addEventListener('click', function (e) {
             switch (e.target.id) {
@@ -93,6 +94,9 @@ export default function Schedule(opt) {
                 case 'clearBtn':
                     _this.clearDate();
                     break;
+                case 'editYears':
+                    _this.editYears();
+                    break;
                 default:
                     break;
             }
@@ -101,7 +105,50 @@ export default function Schedule(opt) {
                 opt.clickCb && opt.clickCb(activeDate);
                 render();
             }
-        }, false)
+        }, false);
+
+        editInput = el.querySelector('.edit-today-input');
+        editInput.addEventListener('focus', function () {
+            canBlur = false;
+        });
+        editInput.addEventListener('keydown', function (e) {
+            if (!/[\d-]/.test(e.key) && ![38, 40, 37, 39, 46, 36, 35, 8].includes(e.keyCode)) {
+                // 允许输入数字、-、箭头、home、end、退格、del
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        });
+        editInput.addEventListener('input', function () {
+            const value = editInput.value;
+            if (/^(\d{4})-(\d{2})$/.test(value)) {
+                const editYear = +RegExp.$1;
+                const editMonth = +RegExp.$2;
+                if (editMonth > 0 && editMonth < 13) {
+                    year = editYear;
+                    month = editMonth - 1;
+                    render();
+                }
+            }
+        });
+        editInput.addEventListener('blur', function () {
+            render();
+            canBlur = true;
+            triggerBlur();
+        });
+
+        let canBlur = true;
+        el.addEventListener('focus', function () {
+            canBlur = false;
+        })
+        el.addEventListener('blur', function () {
+            triggerBlur();
+        });
+
+        function triggerBlur() {
+            setTimeout(function () {
+                canBlur && opt.blur && opt.blur();
+            })
+        }
     }
     var init = function () {
         var scheduleHd = '<div class="schedule-hd">' +
@@ -109,7 +156,7 @@ export default function Schedule(opt) {
             '<span class="arrow icon iconfont icon-116leftarrowheads" id="prevYear" ></span>' +
             '<span class="arrow icon iconfont icon-112leftarrowhead" id="prevMonth"></span>' +
             '</div>' +
-            '<div class="today"></div>' +
+            '<input type="text" id="editYears" class="edit-today-input" maxlength="7"/>' +
             '<div>' +
             '<span class="arrow icon iconfont icon-111arrowheadright" id="nextMonth"></span>' +
             '<span class="arrow icon iconfont icon-115rightarrowheads" id="nextYear"></span>' +
@@ -174,7 +221,7 @@ export default function Schedule(opt) {
             }
         }
         el.querySelector('.schedule-bd').innerHTML = eleTemp.join('');
-        el.querySelector('.today').innerHTML = concatDate(year, month + 1);
+        el.querySelector('.edit-today-input').value = concatDate(year, month + 1);
     };
     this.nextMonthFun = function () {
         if (month + 1 > 11) {
@@ -215,5 +262,9 @@ export default function Schedule(opt) {
     this.clearDate = function () {
         opt.clickCb && opt.clickCb('');
     }
+    this.editYears = function () {
+        editInput.select();
+        editInput.focus();
+    };
     init();
 }

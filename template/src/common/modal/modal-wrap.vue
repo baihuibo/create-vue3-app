@@ -2,13 +2,13 @@
     <div class="modal fade" tabindex="-1" role="dialog"
          :class="{'in' : start,'disabled-select':canMove}"
          @mousemove="mousemove" @mouseup="mouseup">
-        <div class="modal-dialog" :style="fullscreen ? null : {width,height}" :class="{fullscreen,frame}"
+        <div class="modal-dialog" :style="fullscreen ? null : {width,height}" :class="{fullscreen,frame,center}"
              ref="dragRef">
             <div class="modal-content" layout="column">
                 <div class="modal-header" layout="row" layout-align="space-between center"
                      v-if="!noTitle"
                      @mousedown="mousedown">
-                    {{ title }}
+                    {{ title }} &nbsp;
                     <a href="javascript:" @click="closeDialog()" @mousedown.stop class="modal-close">关闭</a>
                 </div>
                 <div class="dialog-body" flex>
@@ -25,7 +25,7 @@ import {ref} from 'vue';
 import {throttle} from "../../util";
 
 export default {
-    props: ['title', 'noTitle', 'width', 'height', 'fullscreen', 'data', 'frame'],
+    props: ['title', 'noTitle', 'width', 'height', 'fullscreen', 'data', 'frame', 'center'],
     setup({fullscreen, frame}, {emit}) {
         const start = ref(false);
         const dragRef = ref('');
@@ -78,6 +78,10 @@ export default {
 <style scoped lang="less">
 .disabled-select {
     user-select: none;
+
+    .modal-dialog {
+        will-change: transform, transition;
+    }
 }
 
 .modal {
@@ -105,6 +109,10 @@ export default {
             padding: 0 !important;
         }
 
+        &.center {
+            margin-top: calc(50vh - 75px);
+        }
+
         .modal-content {
             height: 100%;
 
@@ -115,6 +123,7 @@ export default {
                 color: #3B4141;
                 cursor: move;
                 font-size: 16px;
+                font-weight: bold;
                 line-height: 16px;
                 border-radius: 4px 4px 0 0;
             }
@@ -195,7 +204,6 @@ export default {
         transition: opacity .1s linear;
 
         .modal-dialog {
-            will-change: transform, transition;
             transition: transform .15s ease;
             transform: translate(0, -25%);
         }

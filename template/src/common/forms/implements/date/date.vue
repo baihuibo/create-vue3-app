@@ -3,7 +3,7 @@
         <input type="text" :placeHolder="placeholder" :disabled="disabled" :value="modelValue"
                @click="showDate" @keydown.stop.prevent
                class="form-control" ref="elementRef" :class="{focus:showDateContent}">
-        <div class="boxshaw" ref="boxRef" tabindex="-1" @blur="blur" :id="'date'+uuid" v-if="showDateContent"></div>
+        <div class="boxshaw" ref="boxRef" tabindex="-1" :id="'date'+uuid" v-if="showDateContent"></div>
     </div>
 </template>
 
@@ -30,7 +30,7 @@ export default {
 
         function change(e) {
             schedule = null;
-            showDateContent.value = 0;
+            showDateContent.value = false;
             emit('update:modelValue', e.target.value);
         }
 
@@ -52,6 +52,12 @@ export default {
                     disabledBefore: (props.config || {}).min,	//禁用此日期之前
                     disabledAfter: (props.config || {}).max,	//禁用此日期之后
                     showToday: true,	//回到今天
+                    blur: function () {
+                        if (schedule) {
+                            schedule = null;
+                            showDateContent.value = 0;
+                        }
+                    },
                     clickCb: function (date) {
                         schedule = null;
                         showDateContent.value = false;
@@ -62,14 +68,7 @@ export default {
             })
         }
 
-        function blur() {
-            if (schedule) {
-                schedule = null;
-                showDateContent.value = 0;
-            }
-        }
-
-        return {change, showDate, uuid, showDateContent, blur, boxRef, elementRef}
+        return {change, showDate, uuid, showDateContent, boxRef, elementRef}
     }
 }
 </script>

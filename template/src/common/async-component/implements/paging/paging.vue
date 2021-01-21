@@ -4,10 +4,7 @@
         <div>
             每页
             <select v-model="pageSize" @change="selectRefresh($event.target.value)">
-                <option value="15">15</option>
-                <option value="30">30</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
+                <option v-for="num in pageNums" :value="num">{{ num }}</option>
             </select>
             条
         </div>
@@ -32,7 +29,7 @@
 
         <div>
             前往
-            <input type="text" v-model="goPageRef" @keyup.enter="goPage(goPageRef)">
+            <input type="text" v-model="goPageRef" @input="formatPageFn(goPageRef)" @keyup.enter="goPage(goPageRef)">
             页
             <a href="javascript:" v-if="goPageRef" @click="goPage(goPageRef)">确定</a>
         </div>
@@ -48,17 +45,19 @@ export default {
     props: {
         url: String,
         method: String,
-        pageSize: Number,
+        pageSize: {type: Number, default: 15},
         getData: Function,
         beforeSend: Function,
         initParams: Object,
+        initQueryDone: Function,
+        pageNums: {type: Array, default: [15, 30, 50, 100]},
         responseHandler: Function
     },
     setup(props) {
         const list = ref();
         const total = ref(0);
         const totalPage = ref(0);
-        const pageSize = ref(props.pageSize || 15);
+        const pageSize = ref(props.pageSize);
         const currentPage = ref(1);
         const orderNum = ref(0);
         const goPageRef = ref('');
@@ -66,8 +65,11 @@ export default {
         const cacheParamsRef = ref(); // 上一次查询参数缓存
 
         if (props.initParams && typeof props.initParams === 'object') {
-            onMounted(() => {
-                query(props.initParams);
+            onMounted(async () => {
+                await query(props.initParams);
+                if (typeof props.initQueryDone === 'function') {
+                    props.initQueryDone();
+                }
             });
         }
 
@@ -155,7 +157,7 @@ export default {
             list.value = null;
             total.value = 0;
             totalPage.value = 0;
-            pageSize.value = props.pageSize || 15;
+            pageSize.value = props.pageSize;
             currentPage.value = 1;
             orderNum.value = 0;
         }
@@ -199,8 +201,12 @@ export default {
             queryListen.push({fn, once});
         }
 
+        const formatPageFn = (goPage) => {
+            goPageRef.value = Math.floor(parseInt(goPage)) || null;
+        }
+
         return {
-            props, cacheParamsRef,
+            props, cacheParamsRef, formatPageFn,
             rollback, refresh, query, goPage, selectRefresh,
             list, total, totalPage, pageSize, currentPage, orderNum,
             goPageRef, pageItemsRef, addQueryListen

@@ -18,7 +18,7 @@ const openModal = async () => {
 
 openModal(); // 打开弹窗
 
-// 2. 通过 modal.alert 打开提示弹窗，await 可以在 async-component 方法中阻塞后续代码执行
+// 2. 通过 modal.alert 打开提示弹窗，await 可以在 `async` 方法中阻塞后续代码执行
 await modal.alert('打开一个带有关闭按钮的alert','自定义标题');
 
 // 3. 通过 modal.confirm 打开确认提示弹窗
@@ -61,37 +61,45 @@ export default {
 ```
 
 其它 doc
+
 ```js
 /**
  * 打开弹出层
- * @param component 弹出层组件
+ * @param component 加载组件
  * @param option
- * @param option.title? 设置弹窗标题
- * @param option.data? 设置弹窗数据
- * @param option.width? 设置宽度，默认500px
- * @returns {Promise<any>}
+ * @param option.title 设置弹窗标题
+ * @param option.noTitle 取消标题
+ * @param option.frame 是否frame模式
+ * @param option.center 是否居中显示
+ * @param option.data 设置弹窗数据
+ * @param option.width 设置宽度，默认500px
+ * @param option.height 设置高度，默认 auto
+ * @param option.fullscreen 设置高度，默认 auto
+ * @returns {Promise<unknown>}
  */
 modal.open = function(component , option) {
 }
 
 /**
- * 打开弹出层
+ * 打开 alert 弹出层，默认居中显示
  * @param msg 提示内容
  * @param title 标题默认“提示”
  * @param width
+ * @param center 是否居中显示
  * @returns {Promise<>}
  */
-modal.alert = function(msg, title , width = '300px') {
+modal.alert = function(msg, title , width = '300px',center) {
 }
 
 /**
- * 打开弹出层
+ * 打开confirm 弹出层
  * @param msg 提示内容
  * @param title 标题，默认“提示”
  * @param width
+ * @param center 是否居中显示
  * @returns {Promise<boolean>}
  */
-modal.confirm = function(msg , title , width = '300px') {
+modal.confirm = function(msg , title , width = '300px',center) {
 }
 
 // 打开遮罩层

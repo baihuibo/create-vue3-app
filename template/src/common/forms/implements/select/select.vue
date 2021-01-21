@@ -20,7 +20,7 @@
                         active:!multiple && isSelect(item.valueCode),
                         'active-multiple' : multiple && isSelect(item.valueCode)
                     }"
-                        @click="toggleSelected(item)"
+                        @click="toggleSelected(item)" :ref="el => isSelect(item.valueCode) && scrollToSelfFn(el)"
                         layout="row" layout-align="start center">
                         <input type="checkbox" tabindex="-1"
                                v-if="multiple" :checked="isSelect(item.valueCode)">
@@ -210,6 +210,7 @@ export default {
         function rollBackData() {
             dropdownShowRef.value = false;
             searchText.value = '';
+            oldSearchText = '';
             filterList = []
         }
 
@@ -227,6 +228,12 @@ export default {
             return selecteds.value.findIndex(a => _eq(a, code)) > -1;
         }
 
+        function scrollToSelfFn(el) {
+            nextTick(() => {
+                el && el.scrollIntoViewIfNeeded();
+            })
+        }
+
         function _eq(a, b) {
             return a == b;
         }
@@ -235,7 +242,7 @@ export default {
             viewValue, dropdownRef, dropdownShowRef,
             listRef, elementRef, searchText, selecteds,
             filter, dropdownOpen, dropdownBlur, isSelect,
-            searchFocus, searchBlur, toggleSelected,
+            searchFocus, searchBlur, toggleSelected, scrollToSelfFn
         }
     }
 }

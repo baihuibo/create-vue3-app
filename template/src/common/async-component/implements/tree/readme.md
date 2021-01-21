@@ -39,7 +39,7 @@ export default {
 <template>
     <async-component type="tree"
                      :nodes="nodes"
-                     simple-data :root-id="0"
+                     simple-data
                      @load="treeRef = $event"/>
 </template>
 
@@ -214,7 +214,7 @@ tree.getAllSelectedNodes(all)
 
 /**
  * 获取所有check选中的节点
- * @param all 是否获取所有节点（如包含孩子呗选中时，将孩子也一块返回）
+ * @param {boolean} all 默认只返回父级，若需返回所有节点，需传入true
  * @return {Array}
  **/
 tree.getAllCheckedNodes(all)
@@ -228,21 +228,20 @@ tree.selected    // 获取当前选中的节点（仅单选的时候）
 ```html
 
 <async-component
-    type="tree"
-    selected-multi
-    checkable
-    simple-data
-    id-key="id" pid-key="pid"
-    :nodes="nodes"
-    :root-id="null"
-    :load-data="loadDataFn"
-    :search-text="searchTextRef"
-    :expanded-level="2"
-    @load="treeRef = $event"
-    @before-select="beforeSelectFn"
-    @select="selectFn"
-    @before-check="beforeCheckFn"
-    @check="checkFn"/>
+        type="tree"
+        selected-multi
+        checkable
+        auto-check
+        simple-data
+        :nodes="nodes"
+        :load-data="loadDataFn"
+        :search-text="searchTextRef"
+        :expanded-level="2"
+        @load="treeRef = $event"
+        @before-select="beforeSelectFn"
+        @select="selectFn"
+        @before-check="beforeCheckFn"
+        @check="checkFn"/>
 ```
 
 <table>
@@ -271,6 +270,13 @@ tree.selected    // 获取当前选中的节点（仅单选的时候）
             <td>是否显示多选框，默认false</td>
         </tr>
         <tr>
+            <td>auto-check</td>
+            <td>Boolean</td>
+            <td>true</td>
+            <td>否</td>
+            <td>是否自动关联上下级选中，默认true</td>
+        </tr>
+        <tr>
             <td>simple-data</td>
             <td>Boolean</td>
             <td>false</td>
@@ -283,13 +289,6 @@ tree.selected    // 获取当前选中的节点（仅单选的时候）
             <td></td>
             <td>否</td>
             <td>树节点数据</td>
-        </tr>
-        <tr>
-            <td>root-id</td>
-            <td>Null</td>
-            <td></td>
-            <td>否</td>
-            <td>根节点id</td>
         </tr>
         <tr>
             <td>load-data</td>

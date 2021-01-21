@@ -10,6 +10,7 @@
             <ul class="content-view" v-if="showContentRef && listRef.length" ref="viewRef" @scroll="handleScroll">
                 <li v-for="item in listRef"
                     :class="{active:valueRef === item.valueName}"
+                    :ref="el => valueRef === item.valueName && scrollToSelfFn(el)"
                     @click="chooseItem(item)">{{ item.valueName }}
                 </li>
             </ul>
@@ -90,7 +91,7 @@ export default {
                 param[props.searchContent] = valueRef.value;
             }
 
-            query(param, currentPage);
+            query(param, currentPage, searchTime = Date.now());
         }, 200);
 
         let liveScrollTop, selectScrollTop;
@@ -116,7 +117,7 @@ export default {
 
         function setValue(value = {}) {
             selectValue = value;
-            valueRef.value = value.valueName;
+            valueRef.value = value.valueName || '';
             emit('update:id', value.valueCode);
             emit('update:name', value.valueName);
             emit('update:modelValue', value);
@@ -127,7 +128,7 @@ export default {
             showContentRef.value = false;
             showNoResultRef.value = false;
             if (typeof selectValue.valueCode === 'undefined' || selectValue.valueCode === '') {
-                setValue({valueCode: "", valueName: ""})
+                setValue()
             }
         }
 
@@ -154,7 +155,9 @@ export default {
             }
         }
 
-        async function query(params, pageIndex = 1) {
+        let searchTime;
+
+        async function query(params, pageIndex = 1, now) {
             params = clone(params || {});// clone
             params.pageSize = props.pageSize || 15;
             showNoResultRef.value = false;
@@ -176,6 +179,9 @@ export default {
             if (typeof props.responseHandler === 'function') {
                 result = props.responseHandler(result) || result;
             }
+            if (now !== searchTime) {
+                return result;
+            }
             if (+result.code === 0) {
                 _cacheParams = params; // 缓存参数
                 const {rows, totalPage} = result.data || {};
@@ -191,9 +197,21 @@ export default {
             return result;
         }
 
+        function scrollToSelfFn(el) {
+            nextTick(() => {
+                el && el.scrollIntoViewIfNeeded();
+            })
+        }
+
+        // 还原重新初始化组件
+        function rollback() {
+            listRef.value = [];
+            setValue();
+        }
+
         return {
-            valueRef, listRef, viewRef, showContentRef, showNoResultRef, elementRef,
-            chooseItem, blur, focus, inutBlur, inputChange, handleScroll, containerFocus
+            valueRef, listRef, viewRef, showContentRef, showNoResultRef, elementRef, scrollToSelfFn,
+            chooseItem, blur, focus, inutBlur, inputChange, handleScroll, containerFocus, rollback
         }
     }
 }

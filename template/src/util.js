@@ -55,8 +55,13 @@ export function del(url, params) {
 
 function addParams(url, params) {
     if (params) {
-        const search = Object.keys(params).map(name => name + '=' + params[name]).join('&');
-        url += (url.includes('?') ? '&' : '?') + search;
+        const values = [];
+        Object.keys(params).forEach(name => {
+            if (params[name] != null) {
+                values.push(name + '=' + params[name]);
+            }
+        });
+        url += (url.includes('?') ? '&' : '?') + values.join('&');
     }
     return url;
 }
@@ -142,8 +147,7 @@ export function singleThreadWrapFn(asyncFn) {
             return promise;
         }
         try {
-            promise = asyncFn(...args);
-            return await promise;
+            return promise = asyncFn(...args);
         } catch (e) {
         } finally {
             promise = null;

@@ -1,5 +1,5 @@
 <template>
-    <component :is="'v-' + type" flex>
+    <component :is="'v-' + type" ref="iRef" flex>
         <template v-for="(_,name) of $slots" v-slot:[name]="binds">
             <slot :name="name" v-bind="binds"/>
         </template>
@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import {defineAsyncComponent} from "vue";
+import {defineAsyncComponent, getCurrentInstance, ref, warn, watch} from "vue";
 
 export default {
     props: ['type'],
@@ -22,6 +22,22 @@ export default {
         'v-number': defineAsyncComponent(() => import("./implements/number/number.vue")),
         'v-time': defineAsyncComponent(() => import("./implements/time/time.vue")),
         'v-switch': defineAsyncComponent(() => import("./implements/switch/switch.vue")),
+    },
+    setup(props, {emit}) {
+        if (process.env.NODE_ENV === 'development') {
+            const {type} = getCurrentInstance();
+            if (!type.components['v-' + props.type]) {
+                warn(`无法找到 <form-item type="${props.type}"> 请检查类型`);
+            }
+        }
+        const iRef = ref();
+        const stopWatch = watch(iRef, () => { // 等待实例加载完成
+            if (iRef.value) {
+                stopWatch();
+                emit('load', iRef.value);
+            }
+        })
+        return {iRef};
     }
 };
 </script>
