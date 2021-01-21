@@ -3,7 +3,7 @@
            class="form-control" :class="{step : step>0}"
            @keydown.e.prevent
            @keydown.E.prevent
-           @blur="change"
+           @blur="change" @input="input"
            :step="step || 'any'">
 </template>
 
@@ -15,8 +15,8 @@ export default {
     props: {
         modelValue: [Number, String],
         validateRule: Object,
-        toFixed: Number,
-        step: Number,
+        toFixed: [Number, String],
+        step: [Number, String],
         integer: Boolean
     },
     setup(props, {emit}) {
@@ -29,18 +29,28 @@ export default {
             update(newValue);
         })
         onUpdated(() => {
-            const {value: target} = elementRef;
-
-            target.value = '';
-            target.value = formatFn(props.modelValue);
+            elementRef.value.value = formatFn(props.modelValue);
         })
+
+        let preValue;
 
         function change({target}) {
             if (isNaN(target.valueAsNumber)) {
                 target.value = '';
             }
-            const value = target.valueAsNumber;
-            update(formatFn(value));
+            const currentValue = target.valueAsNumber;
+            if (preValue === currentValue) {
+                return;
+            }
+            preValue = currentValue;
+            target.value = '';
+            update(target.value = formatFn(currentValue));
+        }
+
+        function input(event) {
+            if (!event.target.validity.valid) {
+                change(event);
+            }
         }
 
         function update(newValue) {
@@ -62,7 +72,7 @@ export default {
             return value;
         }
 
-        return {change, elementRef}
+        return {change, elementRef, input}
     }
 }
 </script>
