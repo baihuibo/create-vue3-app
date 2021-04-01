@@ -17,13 +17,13 @@
                     <li v-if="noPlaceholder !== true && !multiple" @click="toggleSelected()">{{ placeholder }}</li>
                     <li v-for="item in filter(searchText)"
                         :class="{
-                        active:!multiple && isSelect(item.valueCode),
-                        'active-multiple' : multiple && isSelect(item.valueCode)
+                        active: !multiple && item.isSelected,
+                        'active-multiple' : multiple && item.isSelected
                     }"
-                        @click="toggleSelected(item)" :ref="el => isSelect(item.valueCode) && scrollToSelfFn(el)"
+                        @click="toggleSelected(item)" :ref="el => (item.el = el) && scrollToSelfFn()"
                         layout="row" layout-align="start center">
                         <input type="checkbox" tabindex="-1"
-                               v-if="multiple" :checked="isSelect(item.valueCode)">
+                               v-if="multiple" :checked="item.isSelected">
                         <div flex class="text">{{ item.valueName }}</div>
                     </li>
                 </ul>
@@ -34,7 +34,7 @@
 
 <script>
 import {nextTick, onMounted, onUpdated, ref} from "vue";
-import {getKeyCodes} from "../../util";
+import {debounce, getKeyCodes} from "../../util";
 import {registerValidate} from "../../form-validator";
 
 export default {
@@ -59,9 +59,9 @@ export default {
         const elementRef = ref()
         const searchText = ref('');
         const selecteds = ref([]);
+        let selectList = [];
 
-        let canBlur = true;
-        let canLoad = false;
+        let canBlur = true, canLoad = false, canScrollIntoView = false;
 
         registerValidate({ref: elementRef, props})
 
@@ -98,6 +98,7 @@ export default {
             if (!dropdownShowRef.value) {
                 loadData()
                 dropdownShowRef.value = true;
+                canScrollIntoView = true;
                 nextTick(() => {
                     if (dropdownRef.value) {
                         dropdownRef.value.focus()
@@ -154,17 +155,15 @@ export default {
                 modelValue = [];
             }
             selecteds.value = modelValue;
+            setViewValue();
 
             const value = multiple ? modelValue : modelValue[0];
-            const currents = listRef.value.filter(a => isSelect(a.valueCode));
-            const labels = currents.map(a => a.valueName);
+            const labels = selectList.map(a => a.valueName);
 
             emit('update:modelValue', value);
-            emit('update:current', multiple ? currents : currents[0]);
+            emit('update:current', multiple ? selectList : selectList[0]);
             emit('update:label', multiple ? labels : labels[0]);
             emit('change', value);
-
-            setViewValue()
 
             function close() {
                 nextTick(rollBackData);
@@ -197,12 +196,16 @@ export default {
         function setViewValue() {
             const modelValue = selecteds.value;
             if (modelValue.length) {
+                selectList = listRef.value.filter(item => {
+                    return item.isSelected = modelValue.findIndex(a => _eq(a, item.valueCode)) > -1;
+                });
                 if (modelValue.length > 4) {
                     viewValue.value = `已选中${modelValue.length}个`
                 } else {
-                    viewValue.value = listRef.value.filter(a => isSelect(a.valueCode)).map(a => a.valueName).join('、');
+                    viewValue.value = selectList.map(a => a.valueName).join('、');
                 }
             } else {
+                selectList = [];
                 viewValue.value = ''
             }
         }
@@ -224,15 +227,21 @@ export default {
             return []
         }
 
-        function isSelect(code) {
-            return selecteds.value.findIndex(a => _eq(a, code)) > -1;
-        }
-
-        function scrollToSelfFn(el) {
-            nextTick(() => {
-                el && el.scrollIntoViewIfNeeded();
-            })
-        }
+        const scrollToSelfFn = debounce(function () {
+            if (canScrollIntoView) {
+                canScrollIntoView = false;
+                if (selectList.length && selectList[0]) { // 如果有选中的，则滚动到第一个选中的元素
+                    const {el} = selectList[0];
+                    if (el) {
+                        if (props.multiple && selectList.length > 1) { // 多选
+                            el.scrollIntoView({block: 'start'})
+                        } else {
+                            el.scrollIntoViewIfNeeded()
+                        }
+                    }
+                }
+            }
+        }, 13);
 
         function _eq(a, b) {
             return a == b;
@@ -241,8 +250,8 @@ export default {
         return {
             viewValue, dropdownRef, dropdownShowRef,
             listRef, elementRef, searchText, selecteds,
-            filter, dropdownOpen, dropdownBlur, isSelect,
-            searchFocus, searchBlur, toggleSelected, scrollToSelfFn
+            filter, dropdownOpen, dropdownBlur, scrollToSelfFn,
+            searchFocus, searchBlur, toggleSelected
         }
     }
 }
